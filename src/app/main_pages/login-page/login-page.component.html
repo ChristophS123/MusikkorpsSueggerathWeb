@@ -1,0 +1,23 @@
+
+<p>Gebe deine Email und dein Passwort ein, um dich anzumelden.</p>
+
+<div class="card">
+
+    <div class="icon">
+        <img src="../../../assets/icon.png" height="200px" width="170px"/>
+    </div>
+    
+    <form #data="ngForm" (ngSubmit)="submitLoginData(data)">
+        <label>Email </label>
+        <br/>
+        <input type="text" name="email" ngModel/>
+        <br/>
+        <br/>
+        <label>Passwort </label>
+        <br/>
+        <input type="password" name="password" ngModel/>
+        <br/>
+        <button type="submit" class="btn btn-primary">Anmelden</button>
+    </form>
+
+</div>

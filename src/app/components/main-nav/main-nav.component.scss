@@ -1,0 +1,35 @@
+@import '~bootstrap/dist/css/bootstrap.min.css';
+@import '../../../assets/styles/variables.scss';
+
+.navbar {
+    background-color: $main-color;
+    color: white;
+}
+
+.navbar-toggler {
+    color: white;
+}
+
+button {
+    font-size: larger;
+}
+
+ul {
+    color: white;
+}
+
+a {
+    color: white;
+    font-size: larger;
+    text-decoration: none;
+}
+
+p {
+    margin-right: 32px;
+    font-size: larger;
+    margin-top: 12px;
+}
+
+li {
+    padding: 16px;
+}

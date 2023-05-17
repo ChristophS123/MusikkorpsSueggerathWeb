@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "musikkorpsminus": {
+      "hosting": {
+        "angulartest": [
+          "musikkorpsminus"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "musikkorpsminus"
+  }
+}

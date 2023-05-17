@@ -1,0 +1,26 @@
+<div class="card">
+
+    <form #data="ngForm" (ngSubmit)="submitSignUpData(data)">
+        <label>Name </label>
+        <br/>
+        <input type="text" name="name" ngModel/>
+        <br/>
+        <br/>
+        <label>Email </label>
+        <br/>
+        <input type="text" name="email" ngModel/>
+        <br/>
+        <br/>
+        <label>Passwort </label>
+        <br/>
+        <input type="password" name="password" ngModel/>
+        <br/>
+        <br/>
+        <label>Passwort Wiederholen</label>
+        <br/>
+        <input type="password" name="repeat" ngModel/>
+        <br/>
+        <button type="submit" class="btn btn-primary">Anmelden</button>
+    </form>
+
+</div>

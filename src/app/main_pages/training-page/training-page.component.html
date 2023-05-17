@@ -1,0 +1,13 @@
+
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Proben
+      </a>
+    </div>
+  </nav>
+
+<div *ngFor="let item of trainings">
+    <app-event-item [event]="item"></app-event-item>
+</div>

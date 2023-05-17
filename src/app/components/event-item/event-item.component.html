@@ -1,0 +1,19 @@
+<div class="card">
+   123 {{user}}
+    <p class="name"><b>{{event.name}}</b></p>
+    <div *ngIf="event.eventCancelled">
+        <p class="eventCancelled">Abgesagt</p>
+    </div>
+    <div *ngIf="!event.eventCancelled">
+        <p class="time">{{event.day}}.{{event.month}}.{{event.year}} {{event.time}}</p>
+    </div>
+    <div class="buttons">
+        <div *ngIf="containsInPromise()">
+            <button class="btn btn-primary" id="cmd-cancel">Absagen</button>
+            <button class="btn btn-primary" id="cmd-promise" style="background-color: rgb(0, 202, 0);">Zusagen</button>
+        </div>
+        <div *ngIf="containsInCancelled()">
+            <button class="btn btn-primary" id="cmd-promise">Zusagen</button>
+        </div>
+    </div>
+</div>
