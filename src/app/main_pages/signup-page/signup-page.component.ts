@@ -45,7 +45,6 @@ export class SignupPageComponent {
     setDoc(doc(usersCollection, userModel.id), userModel).then(() => {
       this.router.navigate(['/main']);
     })
-
   }
 
   

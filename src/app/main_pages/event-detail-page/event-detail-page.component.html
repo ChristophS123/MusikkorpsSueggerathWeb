@@ -1,0 +1,73 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        {{event.name}}
+      </a>
+    </div>
+</nav>
+
+<div class="instrument-title">
+  <b>Alt Saxophone:</b>
+</div>
+<div *ngFor="let item of alto_saxophones">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Tenor Saxophone:</b>
+</div>
+<div *ngFor="let item of tenor_saxophones">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Trompeten:</b>
+</div>
+<div *ngFor="let item of trumpets">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Posaunen:</b>
+</div>
+<div *ngFor="let item of trombones">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Klarinetten:</b>
+</div>
+<div *ngFor="let item of clarinets">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Flöten:</b>
+</div>
+<div *ngFor="let item of flutes">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Schlagwerk:</b>
+</div>
+<div *ngFor="let item of percussions">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Baritone:</b>
+</div>
+<div *ngFor="let item of baritones">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<div class="instrument-title">
+  <b>Sonstige:</b>
+</div>
+<div *ngFor="let item of others">
+  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
+</div>
+
+<button class="btn btn-primary" (click)="cancelEvent()" style="margin-top: 16px;">Termin absagen</button>

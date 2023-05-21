@@ -10,18 +10,5 @@ import { Auth, getAuth, user, signInWithEmailAndPassword, User } from '@angular/
 })
 export class MainPageComponent { 
 
-  constructor(private router:Router) {  }
-
-  signOut() {
-    if(getAuth().currentUser != null) {
-      getAuth().signOut();
-      this.router.navigate(['/anmelden']);
-    }
-  }
-
-  openTrainingPage() {
-    console.log('test')
-    this.router.navigate(['/proben'])
-  }
 
  }

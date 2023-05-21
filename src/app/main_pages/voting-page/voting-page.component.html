@@ -1,0 +1,12 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Abstimmungen
+      </a>
+    </div>
+</nav>
+
+<div *ngFor="let item of votings">
+  <app-voting-item [voting]="item"></app-voting-item>
+</div>

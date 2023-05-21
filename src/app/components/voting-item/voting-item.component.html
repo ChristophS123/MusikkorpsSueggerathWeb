@@ -1,0 +1,12 @@
+<div class="card">
+    <p class="name"><b>{{voting.name}}</b></p>
+    <div *ngIf="containsInLiked()">
+        <button style="background-color: green;" (click)="removeLike()">👍</button> {{voting.liked.length}}
+    </div>
+    <div *ngIf="!containsInLiked()">
+        <button style="background-color: white;" (click)="like()">👍</button> {{voting.liked.length}}
+    </div>
+    <div *ngIf="userModel.admin == 1">
+        <button type="button" style="margin-top: 8px;" class="btn btn-danger" (click)="deleteVotingItem()">Löschen</button>
+    </div>
+</div>

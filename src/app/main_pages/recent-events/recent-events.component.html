@@ -1,0 +1,13 @@
+
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Sonstige Termine
+      </a>
+    </div>
+</nav>
+
+<div *ngFor="let item of events">
+    <app-event-item [event]="item"></app-event-item>
+</div>

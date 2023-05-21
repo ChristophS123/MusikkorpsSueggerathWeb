@@ -10,6 +10,10 @@
     color: white;
 }
 
+.navbar-brand {
+    color: white;
+}
+
 button {
     font-size: larger;
 }
@@ -18,18 +22,12 @@ ul {
     color: white;
 }
 
-a {
-    color: white;
-    font-size: larger;
-    text-decoration: none;
-}
-
-p {
-    margin-right: 32px;
-    font-size: larger;
-    margin-top: 12px;
-}
-
 li {
     padding: 16px;
+}
+
+.nav-button {
+    background-color: red;
+    color: white;
+    box-shadow: none;
 }

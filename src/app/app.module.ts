@@ -17,6 +17,13 @@ import { TrainingPageComponent } from './main_pages/training-page/training-page.
 import { EventItemComponent } from './components/event-item/event-item.component'
 
 import { APP_BASE_HREF } from '@angular/common';
+import { VotingPageComponent } from './main_pages/voting-page/voting-page.component';
+import { VotingItemComponent } from './components/voting-item/voting-item.component';
+import { RecentEventsComponent } from './main_pages/recent-events/recent-events.component';
+import { OrganisationPageComponent } from './main_pages/organisation-page/organisation-page.component';
+import { EventDetailPageComponent } from './main_pages/event-detail-page/event-detail-page.component';
+import { EventDetailsUserItemComponent } from './components/event-details-user-item/event-details-user-item.component';
+import { CreateEventPageComponent } from './main_pages/create-event-page/create-event-page.component';
 
 NgModule({
   // ...
@@ -28,9 +35,21 @@ const allRouts:Routes = [
   { path: 'main', component: MainPageComponent },
   { path: 'registrieren', component: SignupPageComponent },
   { path: 'proben', component: TrainingPageComponent },
+  { path: 'abstimmungen', component: VotingPageComponent },
+  { path: 'sonstige-termine', component: RecentEventsComponent },
+  { path: 'organisation', component: OrganisationPageComponent },
+  { path: 'event-details/:eventID', component: EventDetailPageComponent },
+  { path: 'termin-hinzufuegen', component: CreateEventPageComponent },
+  { path: '**', component: LoginPageComponent }, // TODO: PageNotFound
 ];
 
-// https://www.youtube.com/watch?v=HXSqKW4JCr4 : 11:39 // Angular
+//TODOS
+
+// Event Dates fixen
+// Page Not Found
+// Main gucken ob angemeldet
+// Login page gucken ob angemeldet
+// start page
 
 @NgModule({
   declarations: [
@@ -41,6 +60,13 @@ const allRouts:Routes = [
     MainNavComponent,
     TrainingPageComponent,
     EventItemComponent,
+    VotingPageComponent,
+    VotingItemComponent,
+    RecentEventsComponent,
+    OrganisationPageComponent,
+    EventDetailPageComponent,
+    EventDetailsUserItemComponent,
+    CreateEventPageComponent,
   ],
   imports: [
     RouterModule.forRoot(allRouts),

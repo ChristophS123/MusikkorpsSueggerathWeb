@@ -1,0 +1,27 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Termin hinzufügen
+      </a>
+    </div>
+</nav>
+
+<!--//-->
+<form #data="ngForm" (ngSubmit)="submitEventData(data)">
+  <label>Name </label>
+  <br/>
+  <input type="text" name="name" ngModel/>
+  <br/>
+  <br/>
+  <label>Uhrzeit </label>
+  <br/>
+  <input type="text" name="time" ngModel/>
+  <br/>
+  <br/>
+  <label>Datum </label>
+  <br/>
+  <input type="date" name="date" ngModel/>
+  <br/>
+  <button type="submit" class="btn btn-primary">Erstellen</button>
+</form>

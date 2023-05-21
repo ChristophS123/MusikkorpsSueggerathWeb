@@ -1,0 +1,21 @@
+@import '../../../assets/styles/variables.scss';
+
+main {
+    text-align: center;
+}
+
+.container {
+    background-color: $main-color;
+    padding: 8px;
+    color: white;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.btn {
+    padding-left: 64px;
+    margin-top: 16px;
+    padding-right: 64px;
+}

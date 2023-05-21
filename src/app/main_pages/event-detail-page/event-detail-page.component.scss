@@ -1,0 +1,16 @@
+@import '../../../assets/styles/variables.scss';
+
+.container {
+    background-color: $main-color;
+    padding: 8px;
+    color: white;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.instrument-title {
+    font-size: larger;
+    margin-top: 16px;
+}

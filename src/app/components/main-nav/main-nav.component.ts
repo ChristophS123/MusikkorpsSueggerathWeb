@@ -11,7 +11,7 @@ import { MainPageComponent } from 'src/app/main_pages/main-page/main-page.compon
 })
 export class MainNavComponent {
 
-  @Input() mainPage:MainPageComponent|null = null
+  constructor(private router:Router) {  }
 
   isNavOpen: boolean = false;
 
@@ -20,13 +20,9 @@ export class MainNavComponent {
   }
 
   signOut() {
-    if(this.mainPage !== null)
-      this.mainPage.signOut();
-  }
-
-  openTrainingPage() {
-    if(this.mainPage !== null)
-      this.mainPage.openTrainingPage();
+    getAuth().signOut();
+    this.router.navigate(['/anmelden'])
+    
   }
 
 }

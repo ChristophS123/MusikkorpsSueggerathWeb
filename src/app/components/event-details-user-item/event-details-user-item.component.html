@@ -1,0 +1,42 @@
+<div class="card">
+
+    <div *ngIf="event.promised.includes(user.id)"> 
+        <div class="row align-items-start">
+            <div class="col">
+              {{user.username}}
+            </div>
+            <div class="col">
+              <p style="color: green;">Zugesagt</p>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="event.cancelled.includes(user.id)">
+        <div class="row align-items-start">
+            <div class="col">
+              {{user.username}}
+            </div>
+            <div class="col">
+              <p style="color: red;">Abgesagt</p>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!event.promised.includes(user.id) && !event.cancelled.includes(user.id)">
+        <div class="row align-items-start">
+            <div class="col">
+              {{user.username}}
+            </div>
+            <div class="col">
+              <p style="color: gray;">Ausstehend</p>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+
+</div>
