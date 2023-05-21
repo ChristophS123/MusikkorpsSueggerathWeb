@@ -8,7 +8,15 @@ import { Auth, getAuth, user, signInWithEmailAndPassword, User } from '@angular/
   templateUrl: './main-page.component.html',
   styleUrls: ['./main-page.component.scss']
 })
-export class MainPageComponent { 
+export class MainPageComponent implements OnInit{
 
+  constructor(private firestore:Firestore, private router:Router) {  }
+  
+  ngOnInit(): void {
+    getAuth().onAuthStateChanged(() => {
+      if(getAuth().currentUser == null)
+        this.router.navigate(['login'])
+    })
+  }
 
  }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Firestore, collectionData } from '@angular/fire/firestore';
 import { Event } from 'src/app/models/event';
 import { getDoc, collection } from 'firebase/firestore';
@@ -81,9 +81,12 @@ export class TrainingPageComponent {
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }
-        let date:Date = new Date(event.day, event.month, event.year);
-        let currentDate = new Date();
-        if(currentDate < date)
+        let date:Date = new Date();
+        date.setDate(event.day)
+        date.setMonth(event.month-1)
+        date.setFullYear(event.year)
+        let currentDate = new Date()
+        if(currentDate.getTime() > date.getTime())
           continue
         if(!event.training)
           continue

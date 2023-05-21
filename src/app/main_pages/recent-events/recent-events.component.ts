@@ -35,9 +35,12 @@ export class RecentEventsComponent {
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }
-        let date:Date = new Date(event.day, event.month, event.year);
+        let date:Date = new Date();
+        date.setDate(event.day)
+        date.setMonth(event.month-1)
+        date.setFullYear(event.year)
         let currentDate = new Date()
-        if(currentDate < date)
+        if(currentDate > date)
           continue
         if(event.training)
           continue

@@ -40,16 +40,11 @@ const allRouts:Routes = [
   { path: 'organisation', component: OrganisationPageComponent },
   { path: 'event-details/:eventID', component: EventDetailPageComponent },
   { path: 'termin-hinzufuegen', component: CreateEventPageComponent },
-  { path: '**', component: LoginPageComponent }, // TODO: PageNotFound
+  { path: '**', component: LoginPageComponent } // TODO: PageNotFound
 ];
 
 //TODOS
-
-// Event Dates fixen
-// Page Not Found
-// Main gucken ob angemeldet
-// Login page gucken ob angemeldet
-// start page
+// Sicherheit, dass nicht jeder auf jede seite kommt
 
 @NgModule({
   declarations: [
