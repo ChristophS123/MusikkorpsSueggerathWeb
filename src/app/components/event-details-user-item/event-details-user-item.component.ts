@@ -29,6 +29,7 @@ export class EventDetailsUserItemComponent {
     time: 'Zeit',
     promised: [],
     cancelled: [],
+    maby: [],
     training: false,
     eventCancelled: true,
   };

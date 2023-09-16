@@ -32,6 +32,7 @@ export class RecentEventsComponent {
           time: eventModel['time'],
           promised: eventModel['promised'],
           cancelled: eventModel['cancelled'],
+          maby: eventModel['maby'],
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }
@@ -44,10 +45,24 @@ export class RecentEventsComponent {
           continue
         if(event.training)
           continue
+        console.log(event);
         this.events.push(event);
       }
-    })
+      this.sortEventsByDate();
+    });
    }
+
+   sortEventsByDate() {
+    this.events.sort((a, b) => {
+      if (a.year !== b.year) {
+        return a.year - b.year;
+      }
+      if (a.month !== b.month) {
+        return a.month - b.month;
+      }
+      return a.day - b.day;
+    });
+  }
 
    onBackPressed() {
     this.router.navigate(['main']);

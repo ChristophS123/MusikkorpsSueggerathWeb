@@ -26,7 +26,20 @@
         </div>
     </div>
 
-    <div *ngIf="!event.promised.includes(user.id) && !event.cancelled.includes(user.id)">
+    <div *ngIf="event.maby.includes(user.id)">
+      <div class="row align-items-start">
+          <div class="col">
+            {{user.username}}
+          </div>
+          <div class="col">
+            <p style="color: orange;">Vielleicht</p>
+          </div>
+          <div class="col">
+          </div>
+      </div>
+  </div>
+
+    <div *ngIf="!event.promised.includes(user.id) && !event.cancelled.includes(user.id) && !event.maby.includes(user.id)">
         <div class="row align-items-start">
             <div class="col">
               {{user.username}}

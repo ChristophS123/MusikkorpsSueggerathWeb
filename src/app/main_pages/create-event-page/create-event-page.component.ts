@@ -34,6 +34,7 @@ export class CreateEventPageComponent {
       year:year,
       promised:[],
       cancelled:[],
+      maby: [],
       training:false,
       eventCancelled:false
     }
@@ -42,5 +43,9 @@ export class CreateEventPageComponent {
       this.router.navigate(['/organisation']);
     })
    }
+
+  sendEmail(email:string) {
+    
+  }  
 
 }

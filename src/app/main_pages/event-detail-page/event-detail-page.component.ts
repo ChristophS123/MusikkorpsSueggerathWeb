@@ -23,6 +23,7 @@ export class EventDetailPageComponent implements OnInit {
     time: '',
     promised: [],
     cancelled: [],
+    maby: [],
     training: false,
     eventCancelled: true,
   };
@@ -58,6 +59,7 @@ export class EventDetailPageComponent implements OnInit {
           time: eventModel['time'],
           promised: eventModel['promised'],
           cancelled: eventModel['cancelled'],
+          maby: eventModel['maby'],
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }

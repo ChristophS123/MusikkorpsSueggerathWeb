@@ -7,6 +7,7 @@ export interface Event {
     time:string;
     promised:string[];
     cancelled:string[];
+    maby:string[];
     training:boolean;
     eventCancelled:boolean;
 }

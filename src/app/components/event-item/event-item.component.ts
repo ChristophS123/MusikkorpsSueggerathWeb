@@ -34,6 +34,7 @@ export class EventItemComponent implements OnInit{
     time: 'Zeit',
     promised: [],
     cancelled: [],
+    maby: [],
     training: false,
     eventCancelled: true,
   };
@@ -81,6 +82,12 @@ export class EventItemComponent implements OnInit{
           this.event.promised.splice(index, 1);
         const eventCollection = collection(this.firestore, 'events');
         updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
+      } else if(this.containsInMaby()) {
+        let index = this.event.maby.indexOf(this.user)
+        if(index > -1) 
+          this.event.maby.splice(index, 1);
+        const eventCollection = collection(this.firestore, 'events');
+        updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
       }
     }
     const eventCollection = collection(this.firestore, 'events');
@@ -96,10 +103,37 @@ export class EventItemComponent implements OnInit{
           this.event.cancelled.splice(index, 1);
         const eventCollection = collection(this.firestore, 'events');
         updateDoc(doc(eventCollection, this.event.documentID), "cancelled", this.event.cancelled)
+      } else if(this.containsInMaby()) {
+        let index = this.event.maby.indexOf(this.user)
+        if(index > -1) 
+          this.event.maby.splice(index, 1);
+        const eventCollection = collection(this.firestore, 'events');
+        updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
       }
     }
     const eventCollection = collection(this.firestore, 'events');
     updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
+  }
+
+  maby() {
+    if(this.user !== undefined) {
+      this.event.maby.push(this.user)
+      if(this.containsInCancelled()) {
+        let index = this.event.cancelled.indexOf(this.user)
+        if(index > -1) 
+          this.event.cancelled.splice(index, 1);
+        const eventCollection = collection(this.firestore, 'events');
+        updateDoc(doc(eventCollection, this.event.documentID), "cancelled", this.event.cancelled)
+      } else if(this.containsInPromise()) {
+        let index = this.event.promised.indexOf(this.user)
+        if(index > -1) 
+          this.event.promised.splice(index, 1);
+        const eventCollection = collection(this.firestore, 'events');
+        updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
+      }
+    }
+    const eventCollection = collection(this.firestore, 'events');
+    updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
   }
 
   containsInPromise():boolean {
@@ -114,6 +148,15 @@ export class EventItemComponent implements OnInit{
   containsInCancelled():boolean {{}
     for(let i = 0; i < this.event.cancelled.length; i++) {
       if(this.user == this.event.cancelled[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  containsInMaby():boolean {
+    for(let i = 0; i < this.event.maby.length; i++) {
+      if(this.user == this.event.maby[i]) {
         return true;
       }
     }

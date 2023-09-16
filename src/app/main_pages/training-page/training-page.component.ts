@@ -78,6 +78,7 @@ export class TrainingPageComponent {
           time: eventModel['time'],
           promised: eventModel['promised'],
           cancelled: eventModel['cancelled'],
+          maby: eventModel['maby'],
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }

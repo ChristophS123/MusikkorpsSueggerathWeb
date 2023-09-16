@@ -24,6 +24,7 @@ import { OrganisationPageComponent } from './main_pages/organisation-page/organi
 import { EventDetailPageComponent } from './main_pages/event-detail-page/event-detail-page.component';
 import { EventDetailsUserItemComponent } from './components/event-details-user-item/event-details-user-item.component';
 import { CreateEventPageComponent } from './main_pages/create-event-page/create-event-page.component';
+import { HttpClientModule } from '@angular/common/http';
 
 NgModule({
   // ...
@@ -69,9 +70,11 @@ const allRouts:Routes = [
     FormsModule,
     AppRoutingModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => getFirestore()) 
+    provideFirestore(() => getFirestore()),
+    HttpClientModule,
   ],
-  providers: [],
+  providers: [
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

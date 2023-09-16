@@ -16,6 +16,8 @@ export class SignupPageComponent {
   constructor(private firestore:Firestore, private router:Router) {  }
 
   submitSignUpData(data:any) {
+    let name = data.value['name']
+    let email = data.value['email']
     if(!this.isValidateForm(data)) {
       alert('Bitte fülle alle Felder aus.')
       return
@@ -24,17 +26,17 @@ export class SignupPageComponent {
       alert('Die Passwörter stimmen nicht überein.')
       return
     }
-    createUserWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then(() => {
-      signInWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
-        this.createUserInFirestore(data, user); 
-      })
+    console.log("test")
+    createUserWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
+      console.log(user);
+      this.createUserInFirestore(name, email, user)
     })
   }
-  createUserInFirestore(data: any, user: UserCredential) {
+  createUserInFirestore(name:string, email:string, user: UserCredential) {
     let userModel:User = {
       id: user.user.uid,
-      username: data.value['name'],
-      email: data.value['email'],
+      username: name,
+      email: email,
       fcmToken: "",
       admin: 0,
       instrument: "",
@@ -43,7 +45,9 @@ export class SignupPageComponent {
     }
     const usersCollection = collection(this.firestore, 'users');
     setDoc(doc(usersCollection, userModel.id), userModel).then(() => {
-      this.router.navigate(['/main']);
+      alert("Erfolgreich registriert.")
+    }).catch(() => {
+      console.log("testtttt")
     })
   }
 

@@ -12,14 +12,22 @@
     <div class="buttons">
         <div *ngIf="containsInPromise()">
             <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
+            <button class="btn btn-primary" id="cmd-cancel" style="background-color: orange;" (click)="maby()">?</button>
             <button class="btn btn-primary" id="cmd-promise" style="background-color: gray">Zugesagt</button>
         </div>
         <div *ngIf="containsInCancelled()">
             <button class="btn btn-primary" id="cmd-cancel" style="background-color: gray;">Abgesagt</button>
+            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="maby()">?</button>
             <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
         </div>
-        <div *ngIf="!containsInPromise() && !containsInCancelled()">
+        <div *ngIf="containsInMaby()">
             <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
+            <button class="btn btn-primary" id="cmd-cancel" style="background-color: gray;">?</button>
+            <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
+        </div>
+        <div *ngIf="!containsInPromise() && !containsInCancelled() && !containsInMaby()">
+            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
+            <button class="btn btn-primary" id="cmd-cancel" style="background-color: orange;" (click)="maby()">?</button>
             <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
         </div>
     </div>
