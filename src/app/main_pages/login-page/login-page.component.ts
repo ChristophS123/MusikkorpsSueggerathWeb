@@ -21,6 +21,10 @@ export class LoginPageComponent implements OnInit {
   }
 
   submitLoginData(data:any) {
+    if(data.value['email'] == 'gast' && data.value['password'] == 'gast') {
+      this.router.navigate(['/main']);
+      return;
+    }
      const userCollection = collection(this.firestore, "users");
     collectionData(userCollection).subscribe((collection) => {
       console.log(collection);
