@@ -31,7 +31,6 @@ export class LoginPageComponent implements OnInit {
       signInWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
         this.router.navigate(['/main']);
       }).catch((error) => {
-        alert("Fehler bei der Anmeldung: " + error);
       })
 
     })
