@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, addDoc, collectionData } from '@angular/fire/firestore';
-import { Router, RouterLink } from '@angular/router';
-import { Auth, getAuth, user, signInWithEmailAndPassword } from '@angular/fire/auth';
-import { FirebaseApp } from '@angular/fire/app';
+import { Firestore, collection, collectionData } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
+import { getAuth, signInWithEmailAndPassword } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-login-page',
@@ -21,7 +20,8 @@ export class LoginPageComponent implements OnInit {
   }
 
   submitLoginData(data:any) {
-    if(data.value['email'] == 'gast' && data.value['password'] == 'gast') {
+    if(data.value['email'] == 'gast123' && data.value['password'] == 'gast123') {
+      console.log("test");
       this.router.navigate(['/main']);
       return;
     }
@@ -30,8 +30,8 @@ export class LoginPageComponent implements OnInit {
       console.log(collection);
       signInWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
         this.router.navigate(['/main']);
-      }).catch(() => {
-        
+      }).catch((error) => {
+        alert("Fehler bei der Anmeldung: " + error);
       })
 
     })

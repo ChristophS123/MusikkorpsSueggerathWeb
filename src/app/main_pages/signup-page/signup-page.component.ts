@@ -30,6 +30,8 @@ export class SignupPageComponent {
     createUserWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
       console.log(user);
       this.createUserInFirestore(name, email, user)
+    }).catch((error) => {
+      alert("Fehler bei Registrierung: " + error);
     })
   }
   createUserInFirestore(name:string, email:string, user: UserCredential) {
@@ -46,8 +48,8 @@ export class SignupPageComponent {
     const usersCollection = collection(this.firestore, 'users');
     setDoc(doc(usersCollection, userModel.id), userModel).then(() => {
       alert("Erfolgreich registriert.")
-    }).catch(() => {
-      console.log("testtttt")
+    }).catch((error) => {
+      alert("Fehler bei Registrierung: " + error);
     })
   }
 
