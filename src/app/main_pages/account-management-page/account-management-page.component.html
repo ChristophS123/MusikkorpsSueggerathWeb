@@ -1,0 +1,109 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Benutzeraccounts
+      </a>
+    </div>
+</nav>
+
+<section class="account-management-page">
+  <section class="accounts-hero">
+    <div>
+      <span class="eyebrow">Admin Dashboard</span>
+      <h1>Benutzeraccounts verwalten</h1>
+      <p>Instrumente, Rollen und Basisdaten aller Mitglieder zentral an einem Ort pflegen.</p>
+    </div>
+
+    <div class="hero-stats">
+      <article class="stat-card">
+        <span class="stat-label">Accounts</span>
+        <strong>{{ getManagedAccountCountLabel() }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Admins</span>
+        <strong>{{ getAdminCountLabel() }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="accounts-section">
+    <div class="section-headline accounts-headline">
+      <div>
+        <h2>Accounts verwalten</h2>
+        <p>Instrumente und Rollen direkt auf den Profilkarten anpassen und speichern.</p>
+      </div>
+
+      <label class="search-field" for="accountSearch">
+        <span>Suche</span>
+        <input id="accountSearch" type="text" [(ngModel)]="accountSearch" placeholder="Name, E-Mail oder Instrument">
+      </label>
+    </div>
+
+    <div class="account-skeletons" *ngIf="isAccountsLoading">
+      <div class="account-skeleton" *ngFor="let item of skeletonItems">
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line row"></div>
+        <div class="skeleton-line row short"></div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isAccountsLoading && getFilteredUsers().length === 0">
+      <h3>Keine passenden Accounts gefunden</h3>
+      <p>Pruefe den Suchbegriff oder lege neue Mitglieder ueber die Registrierung an.</p>
+    </div>
+
+    <div class="accounts-grid" *ngIf="!isAccountsLoading && getFilteredUsers().length > 0">
+      <article class="account-card" *ngFor="let managedUser of getFilteredUsers()">
+        <div class="account-card-header">
+          <div class="account-identity">
+            <div class="account-avatar">{{ getInitials(managedUser) }}</div>
+            <div>
+              <h3>{{ managedUser.username }}</h3>
+              <p>{{ managedUser.email }}</p>
+            </div>
+          </div>
+
+          <span class="role-pill" [class.is-admin]="managedUser.admin === 1">{{ getRoleLabel(managedUser) }}</span>
+        </div>
+
+        <div class="account-meta-row">
+          <span class="meta-pill">Standard-Zusage: {{ managedUser.defaultPromise ? 'aktiv' : 'aus' }}</span>
+          <span class="meta-pill">Stuhl-ID: {{ managedUser.chairID || 0 }}</span>
+        </div>
+
+        <label class="account-field">
+          <span>Instrument</span>
+          <select [(ngModel)]="managedUser.instrument">
+            <option *ngFor="let instrument of instrumentOptions" [ngValue]="instrument">
+              {{ instrument.length > 0 ? instrument : 'Kein Instrument' }}
+            </option>
+          </select>
+        </label>
+
+        <div class="role-toggle-row">
+          <div>
+            <h4>Adminrechte</h4>
+            <p>Lege fest, ob dieses Konto die Organisationswerkzeuge sehen darf.</p>
+          </div>
+
+          <button class="role-toggle" type="button" [class.is-active]="managedUser.admin === 1" (click)="toggleAdminRole(managedUser)">
+            <span class="toggle-indicator"></span>
+            <span>{{ managedUser.admin === 1 ? 'Admin aktiv' : 'Admin aus' }}</span>
+          </button>
+        </div>
+
+        <div class="account-card-footer">
+          <p class="save-message" [class.is-success]="managedUser.saveMessage === 'Aenderungen gespeichert.'" [class.is-error]="managedUser.saveMessage === 'Speichern fehlgeschlagen.'">
+            {{ managedUser.saveMessage || (hasUserChanges(managedUser) ? 'Ungespeicherte Aenderungen vorhanden.' : 'Keine offenen Aenderungen.') }}
+          </p>
+
+          <button class="save-button" type="button" [disabled]="!hasUserChanges(managedUser) || managedUser.isSaving" (click)="saveUser(managedUser)">
+            {{ managedUser.isSaving ? 'Wird gespeichert...' : 'Aenderungen speichern' }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>

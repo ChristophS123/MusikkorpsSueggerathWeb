@@ -7,67 +7,124 @@
     </div>
 </nav>
 
-<div class="instrument-title">
-  <b>Alt Saxophone:</b>
-</div>
-<div *ngFor="let item of alto_saxophones">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+<section class="event-detail-page">
+  <div class="event-hero">
+    <div>
+      <span class="eyebrow">Event-Details</span>
+      <h1>{{ event.name || 'Termin wird geladen...' }}</h1>
+      <p>{{ getEventDateLabel() }} · {{ event.time }} Uhr</p>
+    </div>
 
-<div class="instrument-title">
-  <b>Tenor Saxophone:</b>
-</div>
-<div *ngFor="let item of tenor_saxophones">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+    <div class="hero-summary-card">
+      <span class="hero-summary-label">Rueckmeldungen</span>
+      <strong>{{ getAttendanceSummary() }}</strong>
+      <span class="hero-summary-secondary">{{ getOpenResponsesCount() }} ausstehend</span>
+    </div>
+  </div>
 
-<div class="instrument-title">
-  <b>Trompeten:</b>
-</div>
-<div *ngFor="let item of trumpets">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+  <section class="view-toggle-card">
+    <div class="view-toggle">
+      <button
+        class="view-button"
+        [class.active]="viewMode === 'list'"
+        type="button"
+        (click)="viewMode = 'list'">
+        Liste
+      </button>
+      <button
+        class="view-button"
+        [class.active]="viewMode === 'room'"
+        type="button"
+        (click)="viewMode = 'room'">
+        Raumansicht
+      </button>
+    </div>
+  </section>
 
-<div class="instrument-title">
-  <b>Posaunen:</b>
-</div>
-<div *ngFor="let item of trombones">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+  <section class="detail-content" *ngIf="viewMode === 'list'">
+    <div class="section-headline">
+      <h2>Anwesenheit nach Register</h2>
+      <p>Alle Rueckmeldungen uebersichtlich nach Instrumenten sortiert.</p>
+    </div>
 
-<div class="instrument-title">
-  <b>Klarinetten:</b>
-</div>
-<div *ngFor="let item of clarinets">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+    <div class="group-skeletons" *ngIf="isUsersLoading || isEventLoading">
+      <div class="group-skeleton" *ngFor="let item of skeletonItems">
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line row"></div>
+        <div class="skeleton-line row short"></div>
+      </div>
+    </div>
 
-<div class="instrument-title">
-  <b>Flöten:</b>
-</div>
-<div *ngFor="let item of flutes">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+    <div class="user-groups" *ngIf="!isUsersLoading && !isEventLoading">
+      <section class="user-group-card" *ngFor="let group of getUserGroups()">
+        <div class="group-header">
+          <h3>{{ group.title }}</h3>
+          <span>{{ group.users.length }} Personen</span>
+        </div>
 
-<div class="instrument-title">
-  <b>Schlagwerk:</b>
-</div>
-<div *ngFor="let item of percussions">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+        <div class="group-users">
+          <app-event-details-user-item *ngFor="let item of group.users" [user]="item" [event]="event"></app-event-details-user-item>
+        </div>
+      </section>
+    </div>
 
-<div class="instrument-title">
-  <b>Baritone:</b>
-</div>
-<div *ngFor="let item of baritones">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+    <button class="danger-button" type="button" (click)="cancelEvent()">Termin absagen</button>
+  </section>
 
-<div class="instrument-title">
-  <b>Sonstige:</b>
-</div>
-<div *ngFor="let item of others">
-  <app-event-details-user-item [user]="item" [event]="event" ></app-event-details-user-item>
-</div>
+  <section class="detail-content" *ngIf="viewMode === 'room'">
+    <div class="section-headline">
+      <h2>Raumansicht</h2>
+      <p>Live-Uebersicht aller Plaetze mit Rueckmeldungsstatus.</p>
+    </div>
 
-<button class="btn btn-primary" (click)="cancelEvent()" style="margin-top: 16px;">Termin absagen</button>
+    <div class="room-loading-card" *ngIf="isRoomLoading">
+      <div class="skeleton-line title"></div>
+      <div class="room-skeleton-grid"></div>
+    </div>
+
+    <div *ngIf="!isRoomLoading && room" class="room-view-container">
+      <div class="room-canvas-container">
+        <div class="room-canvas" [style.width.px]="room.width" [style.height.px]="room.height">
+          <div
+            *ngFor="let chair of room.chairs"
+            class="chair"
+            [style.left.px]="chair.x"
+            [style.top.px]="chair.y"
+            [style.borderColor]="getStatusColor(chair.userId)">
+            <div class="chair-status" [style.backgroundColor]="getStatusColor(chair.userId)">
+              {{ getStatusText(chair.userId) }}
+            </div>
+            <div class="chair-name">{{ chair.userName || 'Leer' }}</div>
+            <div class="chair-label">{{ getStatusLabel(chair.userId) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="room-legend">
+        <div class="legend-item">
+          <span class="legend-color promised"></span>
+          <span>Zugesagt</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color cancelled"></span>
+          <span>Abgesagt</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color pending"></span>
+          <span>Ausstehend</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color maybe"></span>
+          <span>?</span>
+        </div>
+      </div>
+
+      <button class="danger-button" type="button" (click)="cancelEvent()">Termin absagen</button>
+    </div>
+
+    <div *ngIf="!isRoomLoading && !room" class="empty-room-state">
+      <h3>Kein Probenraum konfiguriert</h3>
+      <p>Gehe zu Organisation → Probenraum bearbeiten, um eine Raumansicht zu hinterlegen.</p>
+    </div>
+  </section>
+</section>

@@ -2,6 +2,12 @@
 
 <app-main-nav></app-main-nav>
 
-<div class="icon">
-    <img src="../../../assets/icon.png" height="248px" width="200px" />
-</div>
+<section class="main-page">
+    <div class="icon">
+        <img src="../../../assets/icon.png" height="248px" width="200px" />
+    </div>
+
+    <article style="margin-top: 64px;" class="joke-card" *ngIf="randomJoke.length > 0">
+        <i>"{{ randomJoke }}"</i>
+    </article>
+</section>

@@ -1,34 +1,29 @@
-<div class="card">
-    <div *ngIf="userModel.admin == 1" style="text-align: start;">
-        <a class="navbar-brand" [routerLink]="['../event-details', eventID]">☰</a>
-    </div>
-    <p class="name"><b>{{event.name}}</b></p>
-    <div *ngIf="event.eventCancelled">
-        <p class="eventCancelled">Abgesagt</p>
-    </div>
-    <div *ngIf="!event.eventCancelled">
-        <p class="time">{{event.day}}.{{event.month}}.{{event.year}} {{event.time}}</p>
-    </div>
-    <div class="buttons">
-        <div *ngIf="containsInPromise()">
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: orange;" (click)="maby()">?</button>
-            <button class="btn btn-primary" id="cmd-promise" style="background-color: gray">Zugesagt</button>
+<article class="event-card" [class.is-cancelled]="event.eventCancelled">
+    <div class="event-card-header">
+        <div class="event-primary">
+            <h3>{{ event.name }}</h3>
+            <p class="event-datetime">{{ getEventDateLabel() }} · {{ event.time }} Uhr</p>
         </div>
-        <div *ngIf="containsInCancelled()">
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: gray;">Abgesagt</button>
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="maby()">?</button>
-            <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
-        </div>
-        <div *ngIf="containsInMaby()">
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: gray;">?</button>
-            <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
-        </div>
-        <div *ngIf="!containsInPromise() && !containsInCancelled() && !containsInMaby()">
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: red;" (click)="cancel()">Absagen</button>
-            <button class="btn btn-primary" id="cmd-cancel" style="background-color: orange;" (click)="maby()">?</button>
-            <button class="btn btn-primary" id="cmd-promise" style="background-color: green;" (click)="promise()">Zusagen</button>
-        </div>
+
+        <a *ngIf="userModel.admin == 1" class="event-admin-link" [routerLink]="['../event-details', eventID]">
+            Details
+        </a>
     </div>
-</div>
+
+    <div class="event-status-row">
+        <span class="event-status-pill" [ngClass]="getStatusClass()">{{ getStatusLabel() }}</span>
+    </div>
+
+
+    <div class="event-actions" *ngIf="!event.eventCancelled">
+        <button class="action-button decline" type="button" [class.active]="containsInCancelled()" [disabled]="containsInCancelled()" (click)="cancel()">
+            {{ containsInCancelled() ? 'Abgesagt' : 'Absagen' }}
+        </button>
+        <button class="action-button maybe" type="button" [class.active]="containsInMaby()" [disabled]="containsInMaby()" (click)="maby()">
+            {{ containsInMaby() ? '?' : '?' }}
+        </button>
+        <button class="action-button promise" type="button" [class.active]="containsInPromise()" [disabled]="containsInPromise()" (click)="promise()">
+            {{ containsInPromise() ? 'Zugesagt' : 'Zusagen' }}
+        </button>
+    </div>
+</article>

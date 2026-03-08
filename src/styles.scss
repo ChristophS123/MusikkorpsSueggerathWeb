@@ -1,1 +1,72 @@
+html,
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+body {
+	min-height: 100vh;
+}
+
+app-root {
+	display: block;
+	width: 100%;
+}
+
+.navbar.bg-body-tertiary {
+	position: sticky;
+	top: 0;
+	z-index: 15;
+	padding: 0;
+	background: linear-gradient(135deg, #0d4f91 0%, #0067ce 58%, #3ea2ff 100%) !important;
+	box-shadow: 0 16px 38px rgba(8, 39, 76, 0.18);
+}
+
+.navbar.bg-body-tertiary .container {
+	max-width: none;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	padding: 12px 16px !important;
+	background: transparent !important;
+	color: #fff !important;
+}
+
+.navbar.bg-body-tertiary .navbar-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 48px;
+	padding: 8px 14px;
+	border-radius: 16px;
+	color: #fff !important;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(12px);
+}
+
+.navbar.bg-body-tertiary .navbar-brand img {
+	width: 28px;
+	height: 28px;
+	object-fit: contain;
+	filter: brightness(0) invert(1);
+}
+
+.navbar.bg-body-tertiary .navbar-brand:hover {
+	color: #fff !important;
+}
+
+@media (min-width: 768px) {
+	.navbar.bg-body-tertiary .container {
+		padding: 14px 24px !important;
+	}
+
+	.navbar.bg-body-tertiary .navbar-brand {
+		padding: 10px 16px;
+	}
+}
 

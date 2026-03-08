@@ -1,9 +1,5 @@
 @import '../../../assets/styles/variables.scss';
 
-main {
-    text-align: center;
-}
-
 .container {
     background-color: $main-color;
     padding: 8px;
@@ -14,32 +10,158 @@ main {
     color: white;
 }
 
-form {
-    margin-top: 32px;
-    text-align: center;
-    align-items: center;
-    margin-bottom: 32px;
-}
-
-button {
-    margin-top: 32px;
-    padding-left: 82px;
-    padding-right: 82px;
-}
-
-input {
-    padding-left: 8px;
-    padding-right: 8px;
-}
-
-.card {
-    margin-top: 32px;
+.create-event-page {
     padding: 16px;
+    display: grid;
+    gap: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(62, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: calc(100vh - 72px);
 }
 
-p {
-    font-style: italic;
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: 32px;
+.create-event-hero {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(14, 51, 93, 0.18);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.76;
+}
+
+.create-event-hero h1,
+.section-headline h2 {
+    margin: 0;
+}
+
+.create-event-hero p,
+.section-headline p,
+.hero-tip-card p,
+.form-field small,
+.status-message {
+    margin: 8px 0 0;
+}
+
+.hero-tip-card,
+.create-event-card {
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.hero-tip-card {
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    backdrop-filter: blur(12px);
+}
+
+.tip-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.72;
+}
+
+.hero-tip-card strong {
+    font-size: 1.05rem;
+}
+
+.create-event-card {
+    padding: 18px;
+}
+
+.create-event-form {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.form-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.form-field {
+    display: grid;
+    gap: 8px;
+}
+
+.form-field span {
+    color: #526372;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.form-field input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #f9fbfd;
+    color: #17324d;
+}
+
+.form-field small {
+    color: #c03a46;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-message {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.status-message.is-success {
+    color: #1f8f3b;
+}
+
+.status-message.is-error {
+    color: #c03a46;
+}
+
+.submit-button {
+    min-height: 52px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    font-weight: 800;
+    box-shadow: 0 14px 28px rgba(16, 76, 136, 0.22);
+}
+
+.submit-button:disabled {
+    cursor: wait;
+    opacity: 0.9;
+}
+
+@media (min-width: 768px) {
+    .create-event-page {
+        padding: 24px;
+        gap: 22px;
+    }
+
+    .create-event-hero {
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+        align-items: end;
+        padding: 26px;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }

@@ -1,0 +1,52 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        Lied-Abstimmungen
+      </a>
+    </div>
+</nav>
+
+<section class="song-voting-page">
+
+  <section class="panel-card summary-panel">
+    <div class="section-headline">
+      <h2>Abstimmungsstand</h2>
+      <p>{{ getTotalVotesLabel() }}</p>
+    </div>
+
+    <div class="summary-skeletons" *ngIf="isLoading">
+      <div class="song-skeleton" *ngFor="let item of skeletonItems">
+        <div class="skeleton-line title"></div>
+        <div class="skeleton-line meta"></div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && songOptions.length === 0">
+      <h3>Noch keine Lieder angelegt</h3>
+      <p>Ein Admin kann in der Organisation neue Lieder fuer die Abstimmung hinzufuegen.</p>
+    </div>
+
+    <div class="song-options" *ngIf="!isLoading && songOptions.length > 0">
+      <article class="song-option-card" *ngFor="let songOption of songOptions">
+        <div>
+          <h3>{{ songOption.name }}</h3>
+          <p>{{ songOption.proVotes.length }} dafuer · {{ songOption.contraVotes.length }} dagegen</p>
+          <span class="vote-state-badge" [class.is-pro]="hasProVote(songOption)" [class.is-contra]="hasContraVote(songOption)">
+            {{ getVoteBadgeLabel(songOption) }}
+          </span>
+        </div>
+
+        <div class="vote-actions">
+          <button class="vote-button vote-pro" type="button" [class.is-active]="hasProVote(songOption)" [disabled]="isSubmitting || hasProVote(songOption)" (click)="voteForSong(songOption, 'pro')">
+            {{ hasProVote(songOption) ? 'Dafür gestimmt' : 'Dafuer' }}
+          </button>
+
+          <button class="vote-button vote-contra" type="button" [class.is-active]="hasContraVote(songOption)" [disabled]="isSubmitting || hasContraVote(songOption)" (click)="voteForSong(songOption, 'contra')">
+            {{ hasContraVote(songOption) ? 'Dagegen gestimmt' : 'Dagegen' }}
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>

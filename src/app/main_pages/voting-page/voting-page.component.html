@@ -2,11 +2,132 @@
     <div class="container">
       <a class="navbar-brand" (click)="onBackPressed()">
         <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
-        Abstimmungen
+        Runde geben
       </a>
     </div>
 </nav>
 
-<div *ngFor="let item of votings">
-  <app-voting-item [voting]="item"></app-voting-item>
-</div>
+<section class="round-page">
+  <section class="round-hero">
+    <div>
+      <span class="eyebrow">Getraenkerunde</span>
+      <h1>Runde geben</h1>
+      <p>Jeder kann Getraenke zur aktuellen Runde hinzufuegen. Die Summen werden live addiert und koennen direkt beim Kellner gezeigt werden.</p>
+    </div>
+
+    <div class="hero-stats">
+      <article class="stat-card">
+        <span class="stat-label">Gesamt</span>
+        <strong>{{ getTotalDrinkCountLabel() }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Auswahl</span>
+        <strong>{{ getUniqueDrinkCountLabel() }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <p class="status-message" *ngIf="statusMessage" [class.is-success]="statusType === 'success'" [class.is-error]="statusType === 'error'" [class.is-info]="statusType === 'info'">
+    {{ statusMessage }}
+  </p>
+
+  <section class="round-layout">
+    <article class="panel-card order-panel">
+      <div class="section-headline">
+        <h2>Getraenk hinzufuegen</h2>
+        <p>Mehrfachbestellungen sind moeglich. Jeder Klick fuegt ein weiteres Getraenk zur Runde hinzu.</p>
+      </div>
+
+      <div class="drink-grid">
+        <button class="drink-button" type="button" *ngFor="let drink of predefinedDrinks" (click)="addDrink(drink)" [disabled]="isSubmitting || isLoading">
+          {{ drink }}
+        </button>
+      </div>
+
+      <div class="custom-drink-card">
+        <label class="custom-field" for="customDrink">
+          <span>Custom</span>
+          <input id="customDrink" type="text" [(ngModel)]="customDrinkName" placeholder="Eigenes Getraenk eingeben" [disabled]="isSubmitting || isLoading">
+        </label>
+
+        <button class="primary-action" type="button" (click)="addCustomDrink()" [disabled]="isSubmitting || isLoading">
+          {{ isSubmitting ? 'Wird hinzugefuegt...' : 'Custom hinzufuegen' }}
+        </button>
+      </div>
+    </article>
+
+    <article class="panel-card summary-panel">
+      <div class="section-headline">
+        <h2>Aktuelle Bestellung</h2>
+        <p>So viele Getraenke wurden bisher fuer die aktuelle Runde bestellt.</p>
+      </div>
+
+      <div class="summary-skeletons" *ngIf="isLoading">
+        <div class="summary-skeleton" *ngFor="let item of skeletonItems">
+          <div class="skeleton-line title"></div>
+          <div class="skeleton-line count"></div>
+        </div>
+      </div>
+
+      <div class="summary-list" *ngIf="!isLoading">
+        <article class="summary-item" *ngFor="let summary of getDrinkSummaries()">
+          <div>
+            <h3>{{ summary.name }}</h3>
+            <p>{{ summary.isCustom ? 'Custom-Getraenk' : 'Standard-Getraenk' }}</p>
+          </div>
+          <strong>{{ summary.count }}</strong>
+        </article>
+      </div>
+    </article>
+  </section>
+
+  <section class="round-layout secondary-layout">
+    <article class="panel-card my-orders-panel">
+      <div class="section-headline">
+        <h2>Deine Bestellungen</h2>
+        <p>Hier kannst du deine eigenen Eintraege sehen und bei Bedarf wieder entfernen.</p>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && getMyOrders().length === 0">
+        <h3>Noch keine Getraenke bestellt</h3>
+        <p>Fuege oben ein oder mehrere Getraenke hinzu, damit sie in deiner Liste auftauchen.</p>
+      </div>
+
+      <div class="my-orders-list" *ngIf="!isLoading && getMyOrders().length > 0">
+        <article class="my-order-item" *ngFor="let order of getMyOrders()">
+          <div>
+            <h3>{{ order.drinkName }}</h3>
+            <p>{{ order.userName }}</p>
+          </div>
+
+          <button class="remove-button" type="button" (click)="removeOrder(order.id)" [disabled]="isSubmitting">
+            Entfernen
+          </button>
+        </article>
+      </div>
+    </article>
+
+    <article class="panel-card reset-panel">
+      <div class="section-headline">
+        <h2>Runde resetten</h2>
+        <p>Setzt alle aktuellen Bestellungen der Runde zurueck. Die Runde bleibt einmalig bestehen und startet dann leer neu.</p>
+      </div>
+
+      <button class="danger-action" type="button" (click)="openResetConfirmation()" [disabled]="isResetting || isLoading">
+        Runde resetten
+      </button>
+
+      <div class="confirm-card" *ngIf="showResetConfirmation">
+        <h3>Wirklich zuruecksetzen?</h3>
+        <p>Dadurch werden alle bisherigen Getraenke der aktuellen Runde entfernt.</p>
+        <div class="confirm-actions">
+          <button class="ghost-action" type="button" (click)="closeResetConfirmation()" [disabled]="isResetting">Abbrechen</button>
+          <button class="danger-action" type="button" (click)="resetRound()" [disabled]="isResetting">
+            {{ isResetting ? 'Runde wird geleert...' : 'Ja, resetten' }}
+          </button>
+        </div>
+      </div>
+    </article>
+  </section>
+</section>

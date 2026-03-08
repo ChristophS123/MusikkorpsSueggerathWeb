@@ -9,3 +9,167 @@
 .navbar-brand {
     color: white;
 }
+
+.recent-events-page {
+    padding: 16px;
+    display: grid;
+    gap: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(62, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: calc(100vh - 72px);
+}
+
+.events-hero {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(14, 51, 93, 0.18);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.76;
+}
+
+.events-hero h1,
+.section-headline h2,
+.empty-state h3 {
+    margin: 0;
+}
+
+.events-hero p,
+.section-headline p,
+.empty-state p,
+.hero-stat-card p {
+    margin: 8px 0 0;
+}
+
+.hero-stat-card {
+    padding: 16px 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+}
+
+.hero-stat-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.72;
+}
+
+.hero-stat-card strong {
+    font-size: 1.1rem;
+}
+
+.events-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.section-headline {
+    display: grid;
+    gap: 4px;
+    padding: 0 2px;
+}
+
+.event-cards,
+.skeleton-list {
+    display: grid;
+    gap: 14px;
+}
+
+.event-skeleton,
+.empty-state {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.skeleton-line,
+.skeleton-badges span,
+.skeleton-actions span {
+    position: relative;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #dbe6f1;
+}
+
+.skeleton-line::after,
+.skeleton-badges span::after,
+.skeleton-actions span::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    animation: skeleton-wave 1.4s infinite;
+}
+
+.skeleton-title {
+    height: 22px;
+    width: 58%;
+}
+
+.skeleton-meta {
+    height: 16px;
+    width: 42%;
+}
+
+.skeleton-badges,
+.skeleton-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.skeleton-badges span {
+    height: 30px;
+    flex: 1;
+}
+
+.skeleton-actions span {
+    height: 48px;
+    flex: 1;
+}
+
+.empty-state {
+    text-align: center;
+}
+
+@keyframes skeleton-wave {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@media (min-width: 768px) {
+    .recent-events-page {
+        padding: 24px;
+        gap: 22px;
+    }
+
+    .events-hero {
+        grid-template-columns: minmax(0, 1fr) 240px;
+        align-items: end;
+        padding: 26px;
+    }
+
+    .event-cards,
+    .skeleton-list {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+}

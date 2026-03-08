@@ -7,22 +7,55 @@
     </div>
 </nav>
 
-<!--//-->
-<form #data="ngForm" (ngSubmit)="submitEventData(data)">
-  <label>Name </label>
-  <br/>
-  <input type="text" name="name" ngModel/>
-  <br/>
-  <br/>
-  <label>Uhrzeit </label>
-  <br/>
-  <input type="text" name="time" ngModel/>
-  <br/>
-  <br/>
-  <label>Datum </label>
-  <br/>
-  <input type="date" name="date" ngModel/>
-  <br/>
-  <button type="submit" class="btn btn-primary">Erstellen</button>
+<section class="create-event-page">
+  <section class="create-event-hero">
+    <div>
+      <span class="eyebrow">Organisation</span>
+      <h1>Neuen Termin anlegen</h1>
+      <p>Erstelle schnell einen neuen sonstigen Termin mit Datum, Uhrzeit und klarer Struktur.</p>
+    </div>
 
-</form>
+    <div class="hero-tip-card">
+      <span class="tip-label">Hinweis</span>
+      <strong>Sonstige Termine</strong>
+      <p>Neue Termine erscheinen anschliessend automatisch in der Uebersicht unter Sonstige Termine.</p>
+    </div>
+  </section>
+
+  <section class="create-event-card">
+    <div class="section-headline">
+      <h2>Termindaten</h2>
+      <p>Alle Felder sind erforderlich.</p>
+    </div>
+
+    <form #data="ngForm" class="create-event-form" (ngSubmit)="submitEventData(data)">
+      <label class="form-field">
+        <span>Name</span>
+        <input type="text" name="name" required ngModel #name="ngModel" placeholder="z. B. Schuetzenfest oder Konzert">
+        <small *ngIf="name.invalid && name.touched">Bitte einen Termin-Namen eingeben.</small>
+      </label>
+
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Uhrzeit</span>
+          <input type="time" name="time" required ngModel #time="ngModel">
+          <small *ngIf="time.invalid && time.touched">Bitte eine Uhrzeit waehlen.</small>
+        </label>
+
+        <label class="form-field">
+          <span>Datum</span>
+          <input type="date" name="date" required ngModel #date="ngModel">
+          <small *ngIf="date.invalid && date.touched">Bitte ein Datum waehlen.</small>
+        </label>
+      </div>
+
+      <p class="status-message" *ngIf="statusMessage" [class.is-success]="statusType === 'success'" [class.is-error]="statusType === 'error'">
+        {{ statusMessage }}
+      </p>
+
+      <button type="submit" class="submit-button" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Termin wird erstellt...' : 'Termin erstellen' }}
+      </button>
+    </form>
+  </section>
+</section>

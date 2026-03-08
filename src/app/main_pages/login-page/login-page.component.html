@@ -1,25 +1,58 @@
+<section class="login-shell">
+    <div class="login-card">
+        <div class="brand-block">
+            <div class="icon">
+                <img src="../../../assets/icon.png" height="200" width="170" alt="Musikkorps Sueggerath Logo">
+            </div>
+            <h1>Willkommen zurueck</h1>
+            <p>Melde dich mit deiner E-Mail-Adresse und deinem Passwort an.</p>
+        </div>
 
-<p>Gebe deine Email und dein Passwort ein, um dich anzumelden.</p>
+        <form #data="ngForm" class="login-form" (ngSubmit)="submitLoginData(data)">
+            <div class="input-group">
+                <label for="email">E-Mail</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    ngModel
+                    #emailModel="ngModel"
+                    required
+                    email
+                    autocomplete="email"
+                    placeholder="name@beispiel.de"
+                >
+                <small *ngIf="emailModel.invalid && emailModel.touched">Bitte gib eine gueltige E-Mail-Adresse ein.</small>
+            </div>
 
-<div class="card">
+            <div class="input-group">
+                <label for="password">Passwort</label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    ngModel
+                    #passwordModel="ngModel"
+                    required
+                    autocomplete="current-password"
+                    placeholder="Dein Passwort"
+                >
+                <small *ngIf="passwordModel.invalid && passwordModel.touched">Bitte gib dein Passwort ein.</small>
+            </div>
 
-    <div class="icon">
-        <img src="../../../assets/icon.png" height="200px" width="170px"/>
+            <div class="status-message error" *ngIf="loginErrorMessage">{{ loginErrorMessage }}</div>
+            <div class="status-message success" *ngIf="loginSuccessMessage">{{ loginSuccessMessage }}</div>
+            <div class="status-message info" *ngIf="resetPasswordMessage">{{ resetPasswordMessage }}</div>
+
+            <button type="submit" class="btn btn-primary login-button" [disabled]="isSubmitting || isSendingResetEmail">
+                {{ isSubmitting ? 'Anmeldung laeuft...' : 'Anmelden' }}
+            </button>
+
+            <button type="button" class="link-button" (click)="sendResetPasswordEmail(data)" [disabled]="isSubmitting || isSendingResetEmail">
+                {{ isSendingResetEmail ? 'Reset-E-Mail wird versendet...' : 'Passwort vergessen?' }}
+            </button>
+        </form>
+
+        <p class="signup-hint">Noch kein Konto? <a routerLink="/registrieren">Konto erstellen</a></p>
     </div>
-    
-    <form #data="ngForm" (ngSubmit)="submitLoginData(data)">
-        <label>Email </label>
-        <br/>
-        <input type="text" name="email" ngModel/>
-        <br/>
-        <br/>
-        <label>Passwort </label>
-        <br/>
-        <input type="password" name="password" ngModel/>
-        <br/>
-        <button type="submit" class="btn btn-primary">Anmelden</button>
-    </form>
-
-    Noch kein Konto? <a routerLink="/registrieren">Konto erstellen</a>
-
-</div>
+</section>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Firestore, collectionData } from '@angular/fire/firestore';
 import { Event } from 'src/app/models/event';
-import { getDoc, collection } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,6 +12,8 @@ import { Router } from '@angular/router';
 export class RecentEventsComponent {
 
   events:Event[] = [];
+  isLoading:boolean = true;
+  readonly skeletonItems:number[] = [1, 2, 3];
 
   constructor(private firestore:Firestore, private router:Router) {
     this.loadEvents();
@@ -20,10 +22,11 @@ export class RecentEventsComponent {
    loadEvents() {
     const eventsCollection = collection(this.firestore, 'events');
     collectionData(eventsCollection).subscribe((val) => {
-      this.events = []
+      const upcomingEvents: Event[] = [];
+
       for(let i = 0; i < val.length; i++) {
-        let eventModel = val[i];
-        let event:Event = {
+        const eventModel = val[i];
+        const event:Event = {
           documentID: eventModel['documentID'],
           name:eventModel['name'],
           day: eventModel['day'],
@@ -36,36 +39,55 @@ export class RecentEventsComponent {
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }
-        let date:Date = new Date();
-        date.setDate(event.day)
-        date.setMonth(event.month-1)
-        date.setFullYear(event.year)
-        let currentDate = new Date()
-        if(currentDate > date)
+
+        const eventDate = this.getEventDate(event);
+        const currentDate = new Date();
+        if(currentDate.getTime() > eventDate.getTime())
           continue
         if(event.training)
           continue
-        console.log(event);
-        this.events.push(event);
+
+        upcomingEvents.push(event);
       }
-      this.sortEventsByDate();
+
+      this.events = upcomingEvents.sort((firstEvent, secondEvent) => {
+        return this.getEventDate(firstEvent).getTime() - this.getEventDate(secondEvent).getTime();
+      });
+      this.isLoading = false;
     });
    }
 
-   sortEventsByDate() {
-    this.events.sort((a, b) => {
-      if (a.year !== b.year) {
-        return a.year - b.year;
-      }
-      if (a.month !== b.month) {
-        return a.month - b.month;
-      }
-      return a.day - b.day;
-    });
-  }
-
    onBackPressed() {
     this.router.navigate(['main']);
+   }
+
+   getNextEventLabel(): string {
+    if (this.events.length === 0) {
+      return 'Aktuell ist kein kommender sonstiger Termin geplant.';
+    }
+
+    const nextEvent = this.events[0];
+    return `${nextEvent.day}.${nextEvent.month}.${nextEvent.year} um ${nextEvent.time} Uhr`;
+   }
+
+   getEventCountLabel(): string {
+    return `${this.events.length} kommender Termin${this.events.length === 1 ? '' : 'e'}`;
+   }
+
+   private getEventDate(event: Event): Date {
+    const [hoursString, minutesString] = event.time.split(':');
+    const hours = Number(hoursString);
+    const minutes = Number(minutesString);
+
+    return new Date(
+      event.year,
+      event.month - 1,
+      event.day,
+      Number.isNaN(hours) ? 0 : hours,
+      Number.isNaN(minutes) ? 0 : minutes,
+      0,
+      0
+    );
    }
 
 }

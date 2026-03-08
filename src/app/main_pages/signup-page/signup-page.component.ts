@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
-import { Firestore, collectionData } from '@angular/fire/firestore';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { Firestore } from '@angular/fire/firestore';
+import { Auth } from '@angular/fire/auth';
+import { NgForm } from '@angular/forms';
+import { FirebaseError } from 'firebase/app';
+import { createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { User } from 'src/app/models/user';
-import { collection, addDoc, getDoc, doc, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 import { Router } from '@angular/router';
-import { getFirestore } from 'firebase/firestore';
 
 @Component({
   selector: 'app-signup-page',
@@ -13,28 +15,51 @@ import { getFirestore } from 'firebase/firestore';
 })
 export class SignupPageComponent {
 
-  constructor(private firestore:Firestore, private router:Router) {  }
+  isSubmitting:boolean = false;
+  signupErrorMessage:string = '';
+  signupSuccessMessage:string = '';
 
-  submitSignUpData(data:any) {
-    let name = data.value['name']
-    let email = data.value['email']
-    if(!this.isValidateForm(data)) {
-      alert('Bitte fülle alle Felder aus.')
-      return
+  constructor(private firestore:Firestore, private router:Router, private auth:Auth) {  }
+
+  async submitSignUpData(data: NgForm): Promise<void> {
+    this.clearMessages();
+
+    const name = String(data.value['name'] ?? '').trim();
+    const email = String(data.value['email'] ?? '').trim().toLowerCase();
+    const password = String(data.value['password'] ?? '');
+    const repeatPassword = String(data.value['repeat'] ?? '');
+
+    if (!this.isValidateForm(name, email, password, repeatPassword)) {
+      this.signupErrorMessage = 'Bitte fuelle alle Felder korrekt aus.';
+      return;
     }
-    if(data.value['password'] != data.value['repeat']) {
-      alert('Die Passwörter stimmen nicht überein.')
-      return
+
+    if (password !== repeatPassword) {
+      this.signupErrorMessage = 'Die Passwoerter stimmen nicht ueberein.';
+      return;
     }
-    console.log("test")
-    createUserWithEmailAndPassword(getAuth(), data.value['email'], data.value['password']).then((user) => {
-      console.log(user);
-      this.createUserInFirestore(name, email, user)
-    }).catch((error) => {
-      alert("Fehler bei Registrierung: " + error);
-    })
+
+    if (password.length < 6) {
+      this.signupErrorMessage = 'Das Passwort muss mindestens 6 Zeichen lang sein.';
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      await this.createUserInFirestore(name, email, userCredential);
+      this.signupSuccessMessage = 'Dein Konto wurde erfolgreich erstellt.';
+      data.resetForm();
+      this.router.navigate(['/anmelden']);
+    } catch (error: unknown) {
+      this.signupErrorMessage = this.getSignupErrorMessage(error);
+    } finally {
+      this.isSubmitting = false;
+    }
   }
-  createUserInFirestore(name:string, email:string, user: UserCredential) {
+
+  private async createUserInFirestore(name:string, email:string, user: UserCredential): Promise<void> {
     let userModel:User = {
       id: user.user.uid,
       username: name,
@@ -46,25 +71,45 @@ export class SignupPageComponent {
       chairID: 0
     }
     const usersCollection = collection(this.firestore, 'users');
-    setDoc(doc(usersCollection, userModel.id), userModel).then(() => {
-      alert("Erfolgreich registriert.")
-    }).catch((error) => {
-      alert("Fehler bei Registrierung: " + error);
-    })
+    await setDoc(doc(usersCollection, userModel.id), userModel)
   }
 
-  
-
-  isValidateForm(data:any):boolean {
-    if(data.value['name'] == '')
+  private isValidateForm(name:string, email:string, password:string, repeatPassword:string):boolean {
+    if(name.length === 0)
       return false;
-    if(data.value['email'] == '')
+    if(email.length === 0)
       return false;
-    if(data.value['password'] == '')
+    if(password.length === 0)
       return false;
-    if(data.value['repeat'] == '')
+    if(repeatPassword.length === 0)
       return false;
     return true
+  }
+
+  private clearMessages(): void {
+    this.signupErrorMessage = '';
+    this.signupSuccessMessage = '';
+  }
+
+  private getSignupErrorMessage(error: unknown): string {
+    if (!(error instanceof FirebaseError)) {
+      return 'Die Registrierung ist fehlgeschlagen. Bitte versuche es erneut.';
+    }
+
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        return 'Zu dieser E-Mail-Adresse existiert bereits ein Konto.';
+      case 'auth/invalid-email':
+        return 'Die E-Mail-Adresse ist nicht gueltig.';
+      case 'auth/weak-password':
+        return 'Das Passwort ist zu schwach. Bitte waehle ein sicheres Passwort.';
+      case 'auth/network-request-failed':
+        return 'Netzwerkfehler. Bitte pruefe deine Internetverbindung.';
+      case 'auth/operation-not-allowed':
+        return 'Die Registrierung per E-Mail ist in Firebase derzeit nicht aktiviert.';
+      default:
+        return 'Die Registrierung ist fehlgeschlagen. Bitte versuche es erneut.';
+    }
   }
 
 }

@@ -7,9 +7,113 @@
     </div>
 </nav>
 
-<main>
-  <button class="btn btn-primary">Comming Soon :-]</button>
-  <button class="btn btn-primary" (click)="openCreateEventPage()">Termin hinzufügen</button>
-  <button class="btn btn-primary">Comming Soon :-]</button>
-</main>
+<section class="organisation-page">
+  <section class="organisation-hero">
+    <div>
+      <span class="eyebrow">Admin Dashboard</span>
+      <h1>Organisation</h1>
+      <p>Alle wichtigen Werkzeuge fuer Termine, Raumplanung und Mitgliederverwaltung an einem Ort.</p>
+    </div>
+
+    <div class="hero-stats">
+      <article class="stat-card">
+        <span class="stat-label">Accounts</span>
+        <strong>{{ getManagedAccountCountLabel() }}</strong>
+      </article>
+
+      <article class="stat-card">
+        <span class="stat-label">Admins</span>
+        <strong>{{ getAdminCountLabel() }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="admin-tools-grid">
+    <article class="tool-card quick-actions-card">
+      <div class="section-headline">
+        <h2>Schnellaktionen</h2>
+        <p>Direkte Admin-Werkzeuge fuer Termine und Raumplanung.</p>
+      </div>
+
+      <div class="quick-actions">
+        <button class="primary-action" type="button" (click)="openCreateEventPage()">Termin hinzufuegen</button>
+        <button class="secondary-action" type="button" (click)="openRehearsalRoomEditor()">Probenraum bearbeiten</button>
+      </div>
+    </article>
+
+    <article class="tool-card training-generator-card">
+      <div class="section-headline">
+        <h2>Proben generieren</h2>
+        <p>Erstellt automatisch neue Montagsproben um 19:00 Uhr auf Basis der letzten vorhandenen Probe.</p>
+      </div>
+
+      <label class="generator-field" for="trainingCount">
+        <span>Anzahl an Proben</span>
+        <input
+          id="trainingCount"
+          type="number"
+          min="1"
+          [(ngModel)]="generatedTrainingCount"
+        >
+      </label>
+
+      <button class="primary-action" type="button" (click)="generateTrainings()" [disabled]="isGeneratingTrainings">
+        {{ isGeneratingTrainings ? 'Proben werden erstellt...' : 'Proben generieren' }}
+      </button>
+
+      <p class="generator-message" *ngIf="trainingGenerationMessage">{{ trainingGenerationMessage }}</p>
+    </article>
+  </section>
+
+  <section class="admin-tools-grid">
+    <article class="tool-card account-entry-card" (click)="openAccountManagementPage()">
+      <div class="section-headline">
+        <h2>Benutzeraccounts</h2>
+        <p>Oeffne die Unterseite fuer Instrumente, Rollen und die komplette Mitgliederverwaltung.</p>
+      </div>
+
+      <div class="account-entry-meta">
+        <span class="entry-pill">{{ getManagedAccountCountLabel() }}</span>
+        <span class="entry-pill">{{ getAdminCountLabel() }}</span>
+      </div>
+
+      <button class="primary-action" type="button" (click)="$event.stopPropagation(); openAccountManagementPage()">Zur Account-Verwaltung</button>
+    </article>
+
+    <article class="tool-card song-voting-card">
+      <div class="section-headline">
+        <h2>Lied-Abstimmungen</h2>
+        <p>Fuege neue Lieder hinzu und oeffne die oeffentliche Abstimmungsseite fuer alle Mitglieder.</p>
+      </div>
+
+      <div class="account-entry-meta">
+        <span class="entry-pill">{{ getSongVotingCountLabel() }}</span>
+      </div>
+
+      <label class="generator-field" for="songVotingName">
+        <span>Neues Lied</span>
+        <input id="songVotingName" type="text" [(ngModel)]="songVotingName" placeholder="Liedname eingeben">
+      </label>
+
+      <div class="quick-actions">
+        <button class="primary-action" type="button" (click)="addSongVotingOption()" [disabled]="isAddingSongVoting">
+          {{ isAddingSongVoting ? 'Wird hinzugefuegt...' : 'Lied hinzufuegen' }}
+        </button>
+        <button class="secondary-action" type="button" (click)="openSongVotingPage()">Zur Lied-Abstimmung</button>
+      </div>
+
+      <p class="generator-message" *ngIf="songVotingMessage">{{ songVotingMessage }}</p>
+
+      <div class="song-voting-list" *ngIf="songVotingOptions.length > 0">
+        <article class="song-voting-item" *ngFor="let songOption of songVotingOptions">
+          <div>
+            <strong>{{ songOption.name }}</strong>
+            <p>{{ songOption.proVotes.length }} dafuer · {{ songOption.contraVotes.length }} dagegen</p>
+          </div>
+          <button class="delete-song-button" type="button" (click)="deleteSongVotingOption(songOption.id)">Entfernen</button>
+        </article>
+      </div>
+    </article>
+  </section>
+</section>
 

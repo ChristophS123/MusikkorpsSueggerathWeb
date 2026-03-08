@@ -8,21 +8,52 @@
     </div>
 </nav>
 
-<div class="form-check">
-  <div *ngIf="userModel.defaultPromise">
-    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" (click)="changeChecked()" checked>
-    <label class="form-check-label" for="flexCheckChecked">
-      Proben standartmäßig zusagen
-    </label>
-  </div>
-  <div *ngIf="!userModel.defaultPromise">
-    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" (click)="changeChecked()">
-    <label class="form-check-label" for="flexCheckChecked">
-      Proben standartmäßig zusagen
-    </label>
-  </div>
-</div>
+<section class="training-page">
 
-<div *ngFor="let item of trainings">
-    <app-event-item [event]="item"></app-event-item>
-</div>
+  <section class="preference-card">
+    <div class="preference-copy">
+      <h2>Standard-Zusage</h2>
+      <p>Wenn du diese Option aktivierst, wirst du bei neuen Proben automatisch als zugesagt eingetragen.</p>
+    </div>
+
+    <button class="preference-toggle" type="button" [class.is-active]="userModel.defaultPromise" [disabled]="isUserLoading || isPreferenceUpdating || userModel.id.length === 0" (click)="changeChecked()">
+      <span class="toggle-indicator"></span>
+      <span>
+        {{ isUserLoading ? 'Standard-Zusage wird geladen...' : isPreferenceUpdating ? 'Standard-Zusage wird gespeichert...' : userModel.defaultPromise ? 'Standard-Zusage aktiv' : 'Standard-Zusage deaktiviert' }}
+      </span>
+    </button>
+  </section>
+
+  <section class="training-list">
+    <div class="section-headline">
+      <h2>Terminliste</h2>
+      <p>Alle anstehenden Proben in chronologischer Reihenfolge.</p>
+    </div>
+
+    <div class="skeleton-list" *ngIf="isLoading">
+      <div class="training-skeleton" *ngFor="let item of skeletonItems">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-meta"></div>
+        <div class="skeleton-badges">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="skeleton-actions">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && trainings.length === 0">
+      <h3>Keine kommenden Proben</h3>
+      <p>Sobald neue Proben geplant sind, erscheinen sie hier automatisch.</p>
+    </div>
+
+    <div class="training-cards" *ngIf="!isLoading && trainings.length > 0">
+      <app-event-item *ngFor="let item of trainings" [event]="item"></app-event-item>
+    </div>
+  </section>
+</section>

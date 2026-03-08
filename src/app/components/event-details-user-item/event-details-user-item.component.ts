@@ -34,4 +34,46 @@ export class EventDetailsUserItemComponent {
     eventCancelled: true,
   };
 
+  getStatus(): 'promised' | 'cancelled' | 'maybe' | 'pending' {
+    if (this.event.promised.includes(this.user.id)) {
+      return 'promised';
+    }
+
+    if (this.event.cancelled.includes(this.user.id)) {
+      return 'cancelled';
+    }
+
+    if (this.event.maby.includes(this.user.id)) {
+      return 'maybe';
+    }
+
+    return 'pending';
+  }
+
+  getStatusLabel(): string {
+    switch (this.getStatus()) {
+      case 'promised':
+        return 'Zugesagt';
+      case 'cancelled':
+        return 'Abgesagt';
+      case 'maybe':
+        return '?';
+      default:
+        return 'Ausstehend';
+    }
+  }
+
+  getStatusDescription(): string {
+    switch (this.getStatus()) {
+      case 'promised':
+        return 'Nimmt am Termin teil';
+      case 'cancelled':
+        return 'Ist fuer diesen Termin abgemeldet';
+      case 'maybe':
+        return 'Rueckmeldung ist noch unsicher';
+      default:
+        return 'Noch keine Rueckmeldung abgegeben';
+    }
+  }
+
 }

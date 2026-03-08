@@ -1,28 +1,84 @@
-<div class="card">
+<section class="signup-shell">
+    <div class="signup-card">
+        <div class="brand-block">
+            <div class="icon">
+                <img src="../../../assets/icon.png" height="200" width="170" alt="Musikkorps Sueggerath Logo">
+            </div>
+            <h1>Konto erstellen</h1>
+            <p>Registriere dich mit deinen Zugangsdaten, um die App nutzen zu koennen.</p>
+        </div>
 
-    <form #data="ngForm" (ngSubmit)="submitSignUpData(data)">
-        <label>Name </label>
-        <br/>
-        <input type="text" name="name" ngModel/>
-        <br/>
-        <br/>
-        <label>Email </label>
-        <br/>
-        <input type="text" name="email" ngModel/>
-        <br/>
-        <br/>
-        <label>Passwort </label>
-        <br/>
-        <input type="password" name="password" ngModel/>
-        <br/>
-        <br/>
-        <label>Passwort Wiederholen</label>
-        <br/>
-        <input type="password" name="repeat" ngModel/>
-        <br/>
-        <button type="submit" class="btn btn-primary">Anmelden</button>
-    </form>
+        <form #data="ngForm" class="signup-form" (ngSubmit)="submitSignUpData(data)">
+            <div class="input-group">
+                <label for="name">Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    name="name"
+                    ngModel
+                    #nameModel="ngModel"
+                    required
+                    autocomplete="name"
+                    placeholder="Vor- und Nachname"
+                >
+                <small *ngIf="nameModel.invalid && nameModel.touched">Bitte gib deinen Namen ein.</small>
+            </div>
 
-    Du hast bereits ein Konto? <a routerLink="/anmelden">Anmelden</a>
+            <div class="input-group">
+                <label for="email">E-Mail</label>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    ngModel
+                    #emailModel="ngModel"
+                    required
+                    email
+                    autocomplete="email"
+                    placeholder="name@beispiel.de"
+                >
+                <small *ngIf="emailModel.invalid && emailModel.touched">Bitte gib eine gueltige E-Mail-Adresse ein.</small>
+            </div>
 
-</div>
+            <div class="input-group">
+                <label for="password">Passwort</label>
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    ngModel
+                    #passwordModel="ngModel"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                    placeholder="Mindestens 6 Zeichen"
+                >
+                <small *ngIf="passwordModel.invalid && passwordModel.touched">Bitte gib ein Passwort mit mindestens 6 Zeichen ein.</small>
+            </div>
+
+            <div class="input-group">
+                <label for="repeat">Passwort wiederholen</label>
+                <input
+                    id="repeat"
+                    type="password"
+                    name="repeat"
+                    ngModel
+                    #repeatModel="ngModel"
+                    required
+                    autocomplete="new-password"
+                    placeholder="Passwort erneut eingeben"
+                >
+                <small *ngIf="repeatModel.invalid && repeatModel.touched">Bitte wiederhole dein Passwort.</small>
+            </div>
+
+            <div class="status-message error" *ngIf="signupErrorMessage">{{ signupErrorMessage }}</div>
+            <div class="status-message success" *ngIf="signupSuccessMessage">{{ signupSuccessMessage }}</div>
+
+            <button type="submit" class="btn btn-primary signup-button" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Registrierung laeuft...' : 'Konto erstellen' }}
+            </button>
+        </form>
+
+        <p class="login-hint">Du hast bereits ein Konto? <a routerLink="/anmelden">Anmelden</a></p>
+    </div>
+</section>

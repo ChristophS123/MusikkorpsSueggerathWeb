@@ -1,55 +1,11 @@
-<div class="card">
-
-    <div *ngIf="event.promised.includes(user.id)"> 
-        <div class="row align-items-start">
-            <div class="col">
-              {{user.username}}
-            </div>
-            <div class="col">
-              <p style="color: green;">Zugesagt</p>
-            </div>
-            <div class="col">
-            </div>
-        </div>
+<article class="user-status-card" [ngClass]="'status-' + getStatus()">
+  <div class="user-identity">
+    <div class="user-avatar">{{ user.username.charAt(0) || '?' }}</div>
+    <div>
+      <h4>{{ user.username }}</h4>
+      <p>{{ getStatusDescription() }}</p>
     </div>
-
-    <div *ngIf="event.cancelled.includes(user.id)">
-        <div class="row align-items-start">
-            <div class="col">
-              {{user.username}}
-            </div>
-            <div class="col">
-              <p style="color: red;">Abgesagt</p>
-            </div>
-            <div class="col">
-            </div>
-        </div>
-    </div>
-
-    <div *ngIf="event.maby.includes(user.id)">
-      <div class="row align-items-start">
-          <div class="col">
-            {{user.username}}
-          </div>
-          <div class="col">
-            <p style="color: orange;">Vielleicht</p>
-          </div>
-          <div class="col">
-          </div>
-      </div>
   </div>
 
-    <div *ngIf="!event.promised.includes(user.id) && !event.cancelled.includes(user.id) && !event.maby.includes(user.id)">
-        <div class="row align-items-start">
-            <div class="col">
-              {{user.username}}
-            </div>
-            <div class="col">
-              <p style="color: gray;">Ausstehend</p>
-            </div>
-            <div class="col">
-            </div>
-        </div>
-    </div>
-
-</div>
+  <div class="status-badge">{{ getStatusLabel() }}</div>
+</article>

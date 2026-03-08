@@ -1,26 +1,70 @@
-<nav class="navbar">
-    <button class="navbar-toggler" type="button" (click)="toggleNav()">
-        ☰
-    </button>
-    <p>Musikkorps Minus</p>
-    <div class="collapse navbar-collapse" [ngClass]="{'show': isNavOpen}">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="navbar-brand" routerLink="/proben">Proben</a>
-        </li>
-        <li class="nav-item">
-            <a class="navbar-brand" routerLink="/sonstige-termine">Sonstige Termine</a>
-        </li>
-        <li class="nav-item">
-            <a class="navbar-brand" routerLink="/abstimmungen">Abstimmungen</a>
-        </li>
-        <li class="nav-item">
-            <a class="navbar-brand" routerLink="/organisation">Organitsation</a>
-        </li>
-        <li>    
-            <button class="nav-button" (click)="signOut()">Abmelden</button>
-        </li>
-        
-      </ul>
+<header class="nav-shell">
+    <div class="nav-topbar">
+        <a class="brand" routerLink="/main" (click)="closeNav()">
+            <img src="../../../assets/icon.png" width="54" height="64" alt="Musikkorps Sueggerath Logo">
+            <div class="brand-copy">
+                <span class="brand-kicker">Musikkorps</span>
+                <strong>Sueggerath</strong>
+            </div>
+        </a>
+
+        <div class="nav-actions">
+            <button class="account-trigger" type="button" (click)="toggleAccountMenu()" [attr.aria-expanded]="isAccountMenuOpen" aria-label="Kontomenue oeffnen">
+                <div class="account-avatar">{{ getInitials() }}</div>
+                <div class="account-copy desktop-account-copy">
+                    <span class="account-name">{{ getDisplayName() }}</span>
+                    <span class="account-role">{{ getSubtitle() }}</span>
+                </div>
+            </button>
+
+            <button class="menu-toggle" type="button" (click)="toggleNav()" [attr.aria-expanded]="isNavOpen" aria-label="Navigation umschalten">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
     </div>
-</nav>
+
+    <div class="nav-panel" [class.open]="isNavOpen">
+        <nav class="nav-links" aria-label="Hauptnavigation">
+            <a
+                *ngFor="let item of getVisibleNavItems()"
+                class="nav-link"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="closeNav()"
+            >
+                {{ item.label }}
+            </a>
+        </nav>
+
+        <div class="nav-footer">
+            <button class="signout-button" type="button" (click)="signOut()">Abmelden</button>
+        </div>
+    </div>
+</header>
+
+<div class="account-popup-backdrop" [class.open]="isAccountMenuOpen" (click)="closeAccountMenu()"></div>
+
+<div class="account-popup" [class.open]="isAccountMenuOpen">
+    <div class="account-popup-card">
+        <div class="account-popup-header">
+            <div class="account-avatar">{{ getInitials() }}</div>
+            <div class="account-copy">
+                <span class="account-name">{{ getDisplayName() }}</span>
+                <span class="account-role">{{ getSubtitle() }}</span>
+            </div>
+        </div>
+
+        <div class="account-details">
+            <span class="account-label">Angemeldet als</span>
+            <span class="account-email">{{ userModel.email || 'Kein Konto geladen' }}</span>
+        </div>
+
+        <div class="account-popup-actions">
+            <button class="secondary-button" type="button" (click)="closeAccountMenu()">Schliessen</button>
+            <button class="signout-button" type="button" (click)="signOut()">Abmelden</button>
+        </div>
+    </div>
+</div>

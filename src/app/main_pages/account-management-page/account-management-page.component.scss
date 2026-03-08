@@ -1,0 +1,352 @@
+@import '../../../assets/styles/variables.scss';
+
+.container {
+    background-color: $main-color;
+    padding: 8px;
+    color: white;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.account-management-page {
+    padding: 16px;
+    display: grid;
+    gap: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(62, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: calc(100vh - 72px);
+}
+
+.accounts-hero {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(14, 51, 93, 0.18);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.76;
+}
+
+.accounts-hero h1,
+.section-headline h2,
+.empty-state h3,
+.account-identity h3,
+.role-toggle-row h4 {
+    margin: 0;
+}
+
+.accounts-hero p,
+.section-headline p,
+.empty-state p,
+.account-identity p,
+.role-toggle-row p {
+    margin: 8px 0 0;
+}
+
+.hero-stats,
+.accounts-grid,
+.account-skeletons {
+    display: grid;
+    gap: 14px;
+}
+
+.stat-card,
+.account-card,
+.empty-state,
+.account-skeleton {
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.stat-card {
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    backdrop-filter: blur(12px);
+}
+
+.stat-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.72;
+}
+
+.stat-card strong {
+    font-size: 1.05rem;
+}
+
+.accounts-section {
+    display: grid;
+    gap: 14px;
+}
+
+.accounts-headline {
+    display: grid;
+    gap: 14px;
+}
+
+.account-card,
+.empty-state,
+.account-skeleton {
+    padding: 18px;
+}
+
+.search-field,
+.account-field {
+    display: grid;
+    gap: 8px;
+}
+
+.search-field span,
+.account-field span {
+    color: #526372;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.search-field input,
+.account-field select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #f9fbfd;
+    color: #17324d;
+}
+
+.account-card {
+    display: grid;
+    gap: 16px;
+}
+
+.account-card-header,
+.account-card-footer,
+.role-toggle-row {
+    display: grid;
+    gap: 12px;
+}
+
+.account-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.account-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    font-weight: 800;
+}
+
+.account-identity p,
+.role-toggle-row p,
+.save-message {
+    color: #627182;
+}
+
+.role-pill,
+.meta-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #edf3f8;
+    color: #5a6a79;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.role-pill.is-admin {
+    background: rgba(18, 61, 110, 0.12);
+    color: #123d6e;
+}
+
+.account-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.role-toggle,
+.save-button {
+    border: none;
+    border-radius: 18px;
+    font-weight: 800;
+}
+
+.role-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: fit-content;
+    min-height: 52px;
+    padding: 0 16px;
+    background: #eef3f8;
+    color: #5f6f80;
+}
+
+.role-toggle.is-active {
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 14px 28px rgba(16, 76, 136, 0.22);
+}
+
+.toggle-indicator {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.18;
+}
+
+.role-toggle.is-active .toggle-indicator {
+    background: rgba(255, 255, 255, 0.22);
+    opacity: 1;
+}
+
+.toggle-indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+    opacity: 0.55;
+}
+
+.role-toggle.is-active .toggle-indicator::after {
+    background: #fff;
+    opacity: 1;
+}
+
+.account-card-footer {
+    align-items: start;
+}
+
+.save-message {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.save-message.is-success {
+    color: #1f8f3b;
+}
+
+.save-message.is-error {
+    color: #c03a46;
+}
+
+.save-button {
+    min-height: 52px;
+    padding: 0 16px;
+    background: #17324d;
+    color: #fff;
+}
+
+.save-button:disabled {
+    background: linear-gradient(180deg, #edf1f5 0%, #dce4ec 100%);
+    color: #8694a3;
+    box-shadow: none;
+}
+
+.skeleton-line {
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ecf1f6 0%, #dfe7ef 50%, #ecf1f6 100%);
+    background-size: 220% 100%;
+    animation: shimmer 1.35s infinite linear;
+}
+
+.skeleton-line.title {
+    width: 44%;
+    height: 1rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-line.row {
+    height: 3.4rem;
+    margin-bottom: 0.7rem;
+}
+
+.skeleton-line.row.short {
+    width: 76%;
+    margin-bottom: 0;
+}
+
+.empty-state {
+    text-align: center;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .account-management-page {
+        padding: 24px;
+        gap: 22px;
+    }
+
+    .accounts-hero {
+        grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+        align-items: end;
+        padding: 26px;
+    }
+
+    .hero-stats,
+    .accounts-grid,
+    .account-skeletons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .accounts-headline {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+        align-items: end;
+    }
+
+    .account-card-header,
+    .account-card-footer,
+    .role-toggle-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+    }
+}

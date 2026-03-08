@@ -1,29 +1,119 @@
-form {
-    margin-top: 32px;
-    text-align: center;
+.signup-shell {
+    min-height: 100vh;
+    display: flex;
     align-items: center;
-    margin-bottom: 32px;
+    justify-content: center;
+    padding: 24px;
+    background: transparent;
 }
 
-button {
-    margin-top: 32px;
-    padding-left: 82px;
-    padding-right: 82px;
+.signup-card {
+    width: min(100%, 460px);
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 24px;
+    padding: 32px 28px;
+    box-shadow: 0 24px 60px rgba(32, 52, 74, 0.16);
 }
 
-input {
-    padding-left: 8px;
-    padding-right: 8px;
+.brand-block {
+    text-align: center;
+    margin-bottom: 24px;
 }
 
-.card {
-    margin-top: 32px;
-    padding: 16px;
+.brand-block h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
 }
 
-p {
-    font-style: italic;
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: 32px;
+.brand-block p {
+    margin: 0;
+    color: #526173;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: #243447;
+}
+
+.input-group input {
+    border: 1px solid #c7d2df;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #2e6ea8;
+    box-shadow: 0 0 0 4px rgba(46, 110, 168, 0.14);
+}
+
+.input-group small {
+    color: #b63d2b;
+}
+
+.status-message {
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+}
+
+.status-message.error {
+    background-color: #fdebea;
+    color: #8a1f17;
+}
+
+.status-message.success {
+    background-color: #ebf8ef;
+    color: #1d6b36;
+}
+
+.signup-button {
+    margin-top: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.signup-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.login-hint {
+    margin-top: 24px;
+    text-align: center;
+    color: #526173;
+}
+
+.login-hint a {
+    text-decoration: none;
+}
+
+@media (max-width: 600px) {
+    .signup-shell {
+        padding: 16px;
+    }
+
+    .signup-card {
+        padding: 24px 18px;
+        border-radius: 18px;
+    }
+
+    .brand-block h1 {
+        font-size: 1.7rem;
+    }
 }

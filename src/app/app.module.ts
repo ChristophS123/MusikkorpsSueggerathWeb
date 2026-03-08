@@ -7,6 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { MainPageComponent } from './main_pages/main-page/main-page.component';
 import { LoginPageComponent } from './main_pages/login-page/login-page.component';
@@ -23,6 +24,9 @@ import { OrganisationPageComponent } from './main_pages/organisation-page/organi
 import { EventDetailPageComponent } from './main_pages/event-detail-page/event-detail-page.component';
 import { EventDetailsUserItemComponent } from './components/event-details-user-item/event-details-user-item.component';
 import { CreateEventPageComponent } from './main_pages/create-event-page/create-event-page.component';
+import { RehearsalRoomEditorComponent } from './main_pages/rehearsal-room-editor/rehearsal-room-editor.component';
+import { AccountManagementPageComponent } from './main_pages/account-management-page/account-management-page.component';
+import { SongVotingPageComponent } from './main_pages/song-voting-page/song-voting-page.component';
 import { HttpClientModule } from '@angular/common/http';
 
 NgModule({
@@ -36,10 +40,13 @@ const allRouts:Routes = [
   { path: 'registrieren', component: SignupPageComponent },
   { path: 'proben', component: TrainingPageComponent },
   { path: 'abstimmungen', component: VotingPageComponent },
+  { path: 'lied-abstimmungen', component: SongVotingPageComponent },
   { path: 'sonstige-termine', component: RecentEventsComponent },
+  { path: 'organisation/accounts', component: AccountManagementPageComponent },
   { path: 'organisation', component: OrganisationPageComponent },
   { path: 'event-details/:eventID', component: EventDetailPageComponent },
   { path: 'termin-hinzufuegen', component: CreateEventPageComponent },
+  { path: 'probenraum-editor', component: RehearsalRoomEditorComponent },
   { path: '**', component: LoginPageComponent } // TODO: PageNotFound
 ];
 
@@ -62,6 +69,9 @@ const allRouts:Routes = [
     EventDetailPageComponent,
     EventDetailsUserItemComponent,
     CreateEventPageComponent,
+    RehearsalRoomEditorComponent,
+    AccountManagementPageComponent,
+    SongVotingPageComponent,
   ],
   imports: [
     RouterModule.forRoot(allRouts),
@@ -69,6 +79,7 @@ const allRouts:Routes = [
     FormsModule,
     AppRoutingModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     HttpClientModule,
   ],

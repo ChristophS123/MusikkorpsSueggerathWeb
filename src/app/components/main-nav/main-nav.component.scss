@@ -1,33 +1,367 @@
-@import '~bootstrap/dist/css/bootstrap.min.css';
 @import '../../../assets/styles/variables.scss';
 
-.navbar {
-    background-color: $main-color;
-    color: white;
+.nav-shell {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    width: 100%;
+    background: linear-gradient(135deg, #0d4f91 0%, $main-color 58%, #3ea2ff 100%);
+    color: $text-color;
+    box-shadow: 0 20px 48px rgba(8, 39, 76, 0.24);
 }
 
-.navbar-toggler {
-    color: white;
+.nav-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px;
 }
 
-.navbar-brand {
-    color: white;
+.brand {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: $text-color;
+    text-decoration: none;
 }
 
-button {
-    font-size: larger;
+.brand img {
+    width: 46px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.18));
 }
 
-ul {
-    color: white;
+.brand-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-li {
-    padding: 16px;
+.brand-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.72;
 }
 
-.nav-button {
-    background-color: red;
-    color: white;
-    box-shadow: none;
+.brand-copy strong {
+    font-size: 1.15rem;
+    line-height: 1.1;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+    position: relative;
+}
+
+.account-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    max-width: min(56vw, 320px);
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(14px);
+    color: $text-color;
+}
+
+.account-avatar {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: 700;
+}
+
+.account-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.account-name,
+.account-role,
+.account-email,
+.account-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-name {
+    font-weight: 700;
+}
+
+.account-role,
+.account-label {
+    font-size: 0.82rem;
+    opacity: 0.82;
+}
+
+.account-popup {
+    display: none;
+    position: fixed;
+    top: 84px;
+    right: 14px;
+    z-index: 40;
+}
+
+.account-popup.open {
+    display: block;
+}
+
+.account-popup-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(5, 17, 33, 0.22);
+    backdrop-filter: blur(2px);
+}
+
+.account-popup-backdrop.open {
+    display: block;
+}
+
+.account-popup-card {
+    width: min(100%, 320px);
+    display: grid;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 20px;
+    background: rgba(4, 26, 51, 0.92);
+    color: $text-color;
+    box-shadow: 0 18px 36px rgba(5, 19, 37, 0.28);
+}
+
+.account-popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: $text-color;
+}
+
+.account-popup-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.secondary-button {
+    min-height: 46px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    background: transparent;
+    color: $text-color;
+    font-weight: 600;
+}
+
+.menu-toggle {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    color: $text-color;
+}
+
+.menu-toggle span {
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+}
+
+.nav-panel {
+    display: none;
+    padding: 0 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.nav-panel.open {
+    display: grid;
+    gap: 14px;
+}
+
+.nav-links {
+    display: grid;
+    gap: 10px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    min-height: 50px;
+    padding: 0 16px;
+    border-radius: 16px;
+    color: $text-color;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.nav-link.active {
+    background: rgba(255, 255, 255, 0.22);
+    font-weight: 700;
+}
+
+.nav-footer {
+    display: grid;
+    gap: 12px;
+    padding-top: 4px;
+    grid-template-columns: 1fr;
+}
+
+.account-details {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(6, 19, 36, 0.18);
+}
+
+.account-email {
+    font-weight: 600;
+}
+
+.signout-button {
+    min-height: 50px;
+    border: none;
+    border-radius: 16px;
+    background: #fff2;
+    color: $text-color;
+    font-weight: 700;
+}
+
+.menu-toggle,
+.account-trigger,
+.secondary-button,
+.signout-button,
+.nav-link {
+    cursor: pointer;
+}
+
+@media (hover: hover) {
+    .nav-link:hover,
+    .account-trigger:hover,
+    .secondary-button:hover,
+    .signout-button:hover,
+    .menu-toggle:hover {
+        transform: translateY(-1px);
+    }
+}
+
+@media (min-width: 768px) {
+    .nav-topbar {
+        padding: 16px 20px;
+    }
+
+    .account-trigger {
+        max-width: 360px;
+        padding: 10px 12px;
+    }
+
+    .desktop-account-copy {
+        display: flex;
+    }
+
+    .account-popup {
+        top: 92px;
+        right: 20px;
+    }
+
+    .nav-panel {
+        padding: 0 20px 16px;
+    }
+
+    .nav-links {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .nav-footer {
+        grid-template-columns: minmax(220px, auto) auto;
+        align-items: center;
+    }
+
+    .signout-button {
+        padding: 0 20px;
+    }
+}
+
+@media (min-width: 1100px) {
+    .nav-topbar,
+    .nav-panel {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .nav-topbar {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .nav-panel {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+@media (max-width: 640px) {
+    .nav-topbar {
+        align-items: flex-start;
+    }
+
+    .brand {
+        flex: 1 1 auto;
+    }
+
+    .brand img {
+        width: 42px;
+    }
+
+    .brand-copy strong {
+        font-size: 1rem;
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .account-trigger {
+        max-width: none;
+        width: 48px;
+        height: 48px;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .desktop-account-copy {
+        display: none;
+    }
+
+    .account-popup {
+        top: 76px;
+        right: 12px;
+    }
 }

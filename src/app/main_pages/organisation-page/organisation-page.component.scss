@@ -1,9 +1,5 @@
 @import '../../../assets/styles/variables.scss';
 
-main {
-    text-align: center;
-}
-
 .container {
     background-color: $main-color;
     padding: 8px;
@@ -14,8 +10,217 @@ main {
     color: white;
 }
 
-.btn {
-    padding-left: 64px;
-    margin-top: 16px;
-    padding-right: 64px;
+.organisation-page {
+    padding: 16px;
+    display: grid;
+    gap: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(62, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: calc(100vh - 72px);
+}
+
+.organisation-hero {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(14, 51, 93, 0.18);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.76;
+}
+
+.organisation-hero h1,
+.section-headline h2 {
+    margin: 0;
+}
+
+.organisation-hero p,
+.section-headline p,
+.generator-message {
+    margin: 8px 0 0;
+}
+
+.hero-stats {
+    display: grid;
+    gap: 12px;
+}
+
+.stat-card,
+.tool-card {
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.stat-card {
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    backdrop-filter: blur(12px);
+}
+
+.stat-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.72;
+}
+
+.stat-card strong {
+    font-size: 1.05rem;
+}
+
+.admin-tools-grid,
+.hero-stats {
+    display: grid;
+    gap: 14px;
+}
+
+.tool-card {
+    padding: 18px;
+}
+
+.quick-actions {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.primary-action,
+.secondary-action {
+    border: none;
+    border-radius: 18px;
+    font-weight: 800;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.primary-action,
+.secondary-action {
+    min-height: 52px;
+    padding: 0 16px;
+}
+
+.primary-action {
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 14px 28px rgba(16, 76, 136, 0.22);
+}
+
+.secondary-action {
+    background: #edf3f8;
+    color: #24425e;
+}
+
+.generator-field {
+    display: grid;
+    gap: 8px;
+}
+
+.generator-field span {
+    color: #526372;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.generator-field input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #f9fbfd;
+    color: #17324d;
+}
+
+.generator-message {
+    color: #4f6070;
+    font-weight: 700;
+}
+
+.account-entry-card {
+    display: grid;
+    gap: 16px;
+    cursor: pointer;
+}
+
+.song-voting-card,
+.song-voting-list {
+    display: grid;
+    gap: 16px;
+}
+
+.account-entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.entry-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #edf3f8;
+    color: #5a6a79;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.song-voting-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: #f8fbff;
+    border: 1px solid #e2eaf2;
+}
+
+.song-voting-item p {
+    margin: 6px 0 0;
+    color: #627182;
+}
+
+.delete-song-button {
+    min-height: 44px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(220, 53, 69, 0.14);
+    color: #c03a46;
+    font-weight: 800;
+}
+
+@media (min-width: 768px) {
+    .organisation-page {
+        padding: 24px;
+        gap: 22px;
+    }
+
+    .organisation-hero {
+        grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+        align-items: end;
+        padding: 26px;
+    }
+
+    .hero-stats,
+    .admin-tools-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }

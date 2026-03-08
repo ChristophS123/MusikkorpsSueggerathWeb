@@ -1,0 +1,62 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+        <a class="navbar-brand" (click)="onBackPressed()">
+            <img src="../../../assets/arrow-left-custom.png" alt="Zurück" width="30" height="24">
+            Probenraum bearbeiten
+        </a>
+    </div>
+</nav>
+
+<main class="editor-container">
+    <div class="controls">
+        <div class="room-settings">
+            <label>Raumname:</label>
+            <input type="text" [(ngModel)]="room.name" class="form-control" />
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" (click)="addChair()">Stuhl hinzufügen</button>
+            <button class="btn btn-success" (click)="saveRoom()">Speichern</button>
+        </div>
+    </div>
+
+    <div class="room-canvas-container">
+        <div 
+            id="room-canvas" 
+            class="room-canvas" 
+            [style.width.px]="room.width" 
+            [style.height.px]="room.height"
+            (mousemove)="onCanvasMouseMove($event)"
+            (mouseup)="onCanvasMouseUp()"
+            (mouseleave)="onCanvasMouseLeave()">
+            
+            <div 
+                *ngFor="let chair of room.chairs" 
+                class="chair"
+                [class.selected]="selectedChair?.id === chair.id"
+                [style.left.px]="chair.x"
+                [style.top.px]="chair.y"
+                (mousedown)="onChairMouseDown($event, chair)">
+                <div class="chair-icon">🪑</div>
+                <div class="chair-name">{{ chair.userName || 'Leer' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chair-editor" *ngIf="selectedChair">
+        <h4>Stuhl #{{ selectedChair.id }}</h4>
+        <div class="form-group">
+            <label>Mitglied zuweisen:</label>
+            <select 
+                class="form-control" 
+                [ngModel]="selectedChair.userId"
+                (ngModelChange)="assignUserToChair(selectedChair, $event)">
+                <option value="">-- Kein Mitglied --</option>
+                <option *ngFor="let user of users" [value]="user.id">
+                    {{ user.username }} ({{ user.instrument }})
+                </option>
+            </select>
+        </div>
+        <button class="btn btn-danger" (click)="removeChair(selectedChair)">Stuhl entfernen</button>
+    </div>
+</main>

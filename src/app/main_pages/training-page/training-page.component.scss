@@ -1,11 +1,239 @@
 @import '../../../assets/styles/variables.scss';
 
-.container {
-    background-color: $main-color;
-    padding: 8px;
-    color: white;
+.training-page {
+    padding: 16px;
+    display: grid;
+    gap: 18px;
+    background:
+        radial-gradient(circle at top right, rgba(62, 162, 255, 0.16), transparent 30%),
+        linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: calc(100vh - 72px);
 }
 
-.navbar-brand {
-    color: white;
+.training-hero {
+    display: grid;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(14, 51, 93, 0.18);
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.76;
+}
+
+.training-hero h1,
+.preference-copy h2,
+.section-headline h2,
+.empty-state h3 {
+    margin: 0;
+}
+
+.training-hero p,
+.preference-copy p,
+.section-headline p,
+.empty-state p {
+    margin: 8px 0 0;
+}
+
+.hero-stat-card {
+    padding: 16px 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+}
+
+.hero-stat-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.72;
+}
+
+.hero-stat-card strong {
+    font-size: 1.1rem;
+}
+
+.preference-card,
+.empty-state {
+    display: grid;
+    gap: 16px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.preference-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: fit-content;
+    min-height: 52px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 999px;
+    background: #eef3f8;
+    color: #5f6f80;
+    font-weight: 700;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preference-toggle:disabled {
+    cursor: wait;
+    opacity: 0.88;
+}
+
+.preference-toggle.is-active {
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    box-shadow: 0 14px 28px rgba(16, 76, 136, 0.22);
+}
+
+.toggle-indicator {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.18;
+}
+
+.preference-toggle.is-active .toggle-indicator {
+    background: rgba(255, 255, 255, 0.22);
+    opacity: 1;
+}
+
+.toggle-indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+    opacity: 0.55;
+}
+
+.preference-toggle.is-active .toggle-indicator::after {
+    background: #fff;
+    opacity: 1;
+}
+
+.training-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.section-headline {
+    display: grid;
+    gap: 4px;
+    padding: 0 2px;
+}
+
+.training-cards,
+.skeleton-list {
+    display: grid;
+    gap: 14px;
+}
+
+.training-skeleton {
+    display: grid;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 14px 34px rgba(19, 44, 77, 0.08);
+}
+
+.skeleton-line,
+.skeleton-badges span,
+.skeleton-actions span {
+    position: relative;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #dbe6f1;
+}
+
+.skeleton-line::after,
+.skeleton-badges span::after,
+.skeleton-actions span::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    animation: skeleton-wave 1.4s infinite;
+}
+
+.skeleton-title {
+    height: 22px;
+    width: 58%;
+}
+
+.skeleton-meta {
+    height: 16px;
+    width: 42%;
+}
+
+.skeleton-badges,
+.skeleton-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.skeleton-badges span {
+    height: 30px;
+    flex: 1;
+}
+
+.skeleton-actions span {
+    height: 48px;
+    flex: 1;
+}
+
+.empty-state {
+    text-align: center;
+}
+
+@keyframes skeleton-wave {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@media (min-width: 768px) {
+    .training-page {
+        padding: 24px;
+        gap: 22px;
+    }
+
+    .training-hero {
+        grid-template-columns: minmax(0, 1fr) 240px;
+        align-items: end;
+        padding: 26px;
+    }
+
+    .preference-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    .training-cards,
+    .skeleton-list {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
 }

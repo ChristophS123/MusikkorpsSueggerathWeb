@@ -8,6 +8,38 @@
     </div>
 </nav>
 
-<div *ngFor="let item of events">
-    <app-event-item [event]="item"></app-event-item>
-</div>
+<section class="recent-events-page">
+
+  <section class="events-list">
+    <div class="section-headline">
+      <h2>Terminliste</h2>
+      <p>Alle anstehenden sonstigen Termine in chronologischer Reihenfolge.</p>
+    </div>
+
+    <div class="skeleton-list" *ngIf="isLoading">
+      <div class="event-skeleton" *ngFor="let item of skeletonItems">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-meta"></div>
+        <div class="skeleton-badges">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="skeleton-actions">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && events.length === 0">
+      <h3>Keine kommenden Termine</h3>
+      <p>Sobald neue sonstige Termine geplant sind, erscheinen sie hier automatisch.</p>
+    </div>
+
+    <div class="event-cards" *ngIf="!isLoading && events.length > 0">
+      <app-event-item *ngFor="let item of events" [event]="item"></app-event-item>
+    </div>
+  </section>
+</section>

@@ -1,23 +1,102 @@
-.card {
-    padding: 8px;
-    margin-left: 16px;
-    margin-top: 4px;
-    font-size: medium;
+.user-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border: 1px solid #e6edf3;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
 
-.float-container {
-    border: 3px solid #fff;
-    padding: 20px;
+.user-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
 }
 
-.float-child {
-    width: 50%;
-    float: left;
-    padding: 20px;
-    border: 2px solid red;
-}  
+.user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    background: #17324d;
+    color: #ffffff;
+    font-weight: 800;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
 
-p {
+.user-identity h4 {
     margin: 0;
-    padding: 0;
+    color: #14263b;
+    font-size: 0.98rem;
+    font-weight: 800;
+}
+
+.user-identity p {
+    margin: 0.18rem 0 0;
+    color: #6a7988;
+    font-size: 0.83rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 7.25rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.status-promised {
+    border-color: rgba(40, 167, 69, 0.18);
+}
+
+.status-promised .status-badge {
+    background: rgba(40, 167, 69, 0.14);
+    color: #1f8f3b;
+}
+
+.status-cancelled {
+    border-color: rgba(220, 53, 69, 0.18);
+}
+
+.status-cancelled .status-badge {
+    background: rgba(220, 53, 69, 0.14);
+    color: #c03a46;
+}
+
+.status-maybe {
+    border-color: rgba(255, 193, 7, 0.22);
+}
+
+.status-maybe .status-badge {
+    background: rgba(255, 193, 7, 0.18);
+    color: #b88900;
+}
+
+.status-pending {
+    border-color: rgba(154, 166, 178, 0.24);
+}
+
+.status-pending .status-badge {
+    background: rgba(154, 166, 178, 0.16);
+    color: #617181;
+}
+
+@media (max-width: 520px) {
+    .user-status-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .status-badge {
+        min-width: 0;
+    }
 }

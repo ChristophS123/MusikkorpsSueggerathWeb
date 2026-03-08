@@ -1,17 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Firestore, collectionData } from '@angular/fire/firestore';
 import { getAuth } from 'firebase/auth';
+import { collection, doc, updateDoc } from 'firebase/firestore';
 import { Event } from 'src/app/models/event';
 import { User } from 'src/app/models/user';
-import { getDoc, updateDoc, collection, doc} from 'firebase/firestore';
-import { Firestore, collectionData } from '@angular/fire/firestore';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-event-item',
   templateUrl: './event-item.component.html',
   styleUrls: ['./event-item.component.scss']
 })
-export class EventItemComponent implements OnInit{
+export class EventItemComponent implements OnInit {
 
   user:string|undefined = '';
   userModel:User = {
@@ -23,7 +22,7 @@ export class EventItemComponent implements OnInit{
     defaultPromise: false,
     fcmToken: '',
     instrument: ''
-  }
+  };
 
   @Input() event:Event = {
     documentID: '',
@@ -38,129 +37,166 @@ export class EventItemComponent implements OnInit{
     training: false,
     eventCancelled: true,
   };
+
   eventID:string = '';
 
-  constructor(private firestore:Firestore, private router:Router) {
+  constructor(private firestore:Firestore) {
     this.user = getAuth().currentUser?.uid;
-    this.loadUser()
+    this.loadUser();
   }
 
   ngOnInit(): void {
-    this.eventID = this.event.documentID
+    this.eventID = this.event.documentID;
   }
 
-  loadUser() {
+  loadUser(): void {
     const usersCollection = collection(this.firestore, 'users');
-    collectionData(usersCollection).subscribe((val) => {
-      for(let i = 0; i < val.length; i++) {
-        let mUserModel = val[i];
-        if(this.user == undefined)
-          continue
-        if(mUserModel['id'] == this.user) {
+    collectionData(usersCollection).subscribe((users) => {
+      for (const userModel of users) {
+        if (this.user === undefined) {
+          continue;
+        }
+
+        if (userModel['id'] === this.user) {
           this.userModel = {
-            id: mUserModel['id'],
-            username: mUserModel['username'],
-            email: mUserModel['email'],
-            fcmToken: mUserModel['fcmToken'],
-            admin: mUserModel['admin'],
-            instrument: mUserModel['instrument'],
-            chairID: mUserModel['chairID'],
-            defaultPromise: mUserModel['defaultPromise']
-          }
-          break
+            id: userModel['id'],
+            username: userModel['username'],
+            email: userModel['email'],
+            fcmToken: userModel['fcmToken'],
+            admin: userModel['admin'],
+            instrument: userModel['instrument'],
+            chairID: userModel['chairID'],
+            defaultPromise: userModel['defaultPromise']
+          };
+          break;
         }
       }
-    })
-   }
-
-  cancel() {
-    if(this.user !== undefined) {
-      this.event.cancelled.push(this.user)
-      if(this.containsInPromise()) {
-        let index = this.event.promised.indexOf(this.user)
-        if(index > -1) 
-          this.event.promised.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
-      } else if(this.containsInMaby()) {
-        let index = this.event.maby.indexOf(this.user)
-        if(index > -1) 
-          this.event.maby.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
-      }
-    }
-    const eventCollection = collection(this.firestore, 'events');
-    updateDoc(doc(eventCollection, this.event.documentID), "cancelled", this.event.cancelled)
+    });
   }
 
-  promise() {
-    if(this.user !== undefined) {
-      this.event.promised.push(this.user)
-      if(this.containsInCancelled()) {
-        let index = this.event.cancelled.indexOf(this.user)
-        if(index > -1) 
-          this.event.cancelled.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "cancelled", this.event.cancelled)
-      } else if(this.containsInMaby()) {
-        let index = this.event.maby.indexOf(this.user)
-        if(index > -1) 
-          this.event.maby.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
-      }
-    }
-    const eventCollection = collection(this.firestore, 'events');
-    updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
+  cancel(): void {
+    this.updateResponseState('cancelled');
   }
 
-  maby() {
-    if(this.user !== undefined) {
-      this.event.maby.push(this.user)
-      if(this.containsInCancelled()) {
-        let index = this.event.cancelled.indexOf(this.user)
-        if(index > -1) 
-          this.event.cancelled.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "cancelled", this.event.cancelled)
-      } else if(this.containsInPromise()) {
-        let index = this.event.promised.indexOf(this.user)
-        if(index > -1) 
-          this.event.promised.splice(index, 1);
-        const eventCollection = collection(this.firestore, 'events');
-        updateDoc(doc(eventCollection, this.event.documentID), "promised", this.event.promised)
-      }
-    }
-    const eventCollection = collection(this.firestore, 'events');
-    updateDoc(doc(eventCollection, this.event.documentID), "maby", this.event.maby)
+  promise(): void {
+    this.updateResponseState('promised');
+  }
+
+  maby(): void {
+    this.updateResponseState('maby');
   }
 
   containsInPromise():boolean {
-    for(let i = 0; i < this.event.promised.length; i++) {
-      if(this.user == this.event.promised[i]) {
-        return true;
-      }
-    }
-    return false;
+    return this.containsInList(this.event.promised);
   }
 
-  containsInCancelled():boolean {{}
-    for(let i = 0; i < this.event.cancelled.length; i++) {
-      if(this.user == this.event.cancelled[i]) {
-        return true;
-      }
-    }
-    return false;
+  containsInCancelled():boolean {
+    return this.containsInList(this.event.cancelled);
   }
 
   containsInMaby():boolean {
-    for(let i = 0; i < this.event.maby.length; i++) {
-      if(this.user == this.event.maby[i]) {
-        return true;
-      }
+    return this.containsInList(this.event.maby);
+  }
+
+  getEventDateLabel(): string {
+    return `${this.padValue(this.event.day)}.${this.padValue(this.event.month)}.${this.event.year}`;
+  }
+
+  getStatusLabel(): string {
+    if (this.event.eventCancelled) {
+      return 'Abgesagt';
     }
-    return false;
+
+    if (this.containsInPromise()) {
+      return 'Du hast zugesagt';
+    }
+
+    if (this.containsInCancelled()) {
+      return 'Du hast abgesagt';
+    }
+
+    if (this.containsInMaby()) {
+      return 'Deine Rueckmeldung ist offen';
+    }
+
+    return 'Bitte gib deine Rueckmeldung ab';
+  }
+
+  getStatusClass(): string {
+    if (this.event.eventCancelled) {
+      return 'cancelled';
+    }
+
+    if (this.containsInPromise()) {
+      return 'promised';
+    }
+
+    if (this.containsInCancelled()) {
+      return 'declined';
+    }
+
+    if (this.containsInMaby()) {
+      return 'maybe';
+    }
+
+    return 'open';
+  }
+
+  getResponseCountLabel(): string {
+    return `${this.event.promised.length} zugesagt · ${this.event.maby.length} offen · ${this.event.cancelled.length} abgesagt`;
+  }
+
+  getUserActionLabel(): string {
+    if (this.containsInPromise()) {
+      return 'Zugesagt';
+    }
+
+    if (this.containsInCancelled()) {
+      return 'Abgesagt';
+    }
+
+    if (this.containsInMaby()) {
+      return 'Vielleicht';
+    }
+
+    return 'Offen';
+  }
+
+  private containsInList(list: string[]): boolean {
+    if (this.user === undefined) {
+      return false;
+    }
+
+    return list.includes(this.user);
+  }
+
+  private updateResponseState(nextState: 'promised' | 'cancelled' | 'maby'): void {
+    if (this.user === undefined || this.event.eventCancelled) {
+      return;
+    }
+
+    this.event.promised = this.event.promised.filter((entry) => entry !== this.user);
+    this.event.cancelled = this.event.cancelled.filter((entry) => entry !== this.user);
+    this.event.maby = this.event.maby.filter((entry) => entry !== this.user);
+
+    if (nextState === 'promised') {
+      this.event.promised.push(this.user);
+    } else if (nextState === 'cancelled') {
+      this.event.cancelled.push(this.user);
+    } else {
+      this.event.maby.push(this.user);
+    }
+
+    const eventCollection = collection(this.firestore, 'events');
+    updateDoc(doc(eventCollection, this.event.documentID), {
+      promised: this.event.promised,
+      cancelled: this.event.cancelled,
+      maby: this.event.maby,
+    });
+  }
+
+  private padValue(value: number): string {
+    return String(value).padStart(2, '0');
   }
 
 }
