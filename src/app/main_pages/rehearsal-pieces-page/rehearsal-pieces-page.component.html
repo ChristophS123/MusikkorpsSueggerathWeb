@@ -1,0 +1,124 @@
+<nav class="navbar bg-body-tertiary">
+    <div class="container">
+      <a class="navbar-brand" (click)="onBackPressed()">
+        <img src="../../../assets/arrow-left-custom.png" alt="Bootstrap" width="30" height="24">
+        {{ rehearsal?.name || 'Probe' }} · Stücke
+      </a>
+    </div>
+</nav>
+
+<section class="rehearsal-pieces-page">
+  <section class="pieces-hero">
+    <div>
+      <span class="eyebrow">Probenplanung</span>
+      <h1>{{ rehearsal?.name || 'Stückliste wird geladen...' }}</h1>
+      <p *ngIf="rehearsal as currentRehearsal">{{ currentRehearsal.day }}.{{ currentRehearsal.month }}.{{ currentRehearsal.year }} · {{ currentRehearsal.time }} Uhr</p>
+      <p *ngIf="!rehearsal && !isEventLoading">Diese Probe konnte nicht geladen werden.</p>
+    </div>
+  </section>
+
+  <section class="pieces-editor-card" *ngIf="isAdmin && rehearsal">
+    <div class="section-headline">
+      <h2>Stücke verwalten</h2>
+      <p>Neue Eintraege werden direkt an dieser Probe gespeichert und gleichzeitig als Vorlage fuer spaetere Proben hinterlegt.</p>
+    </div>
+
+    <div class="piece-form-row">
+      <input
+        type="text"
+        class="piece-input"
+        name="pieceName"
+        [(ngModel)]="newPieceName"
+        [disabled]="isSaving"
+        list="rehearsal-piece-template-list"
+        placeholder="z. B. La Le Lu">
+
+      <button type="button" class="primary-button" [disabled]="isSaving" (click)="addPiece()">
+        {{ isSaving ? 'Speichert...' : 'Stück hinzufügen' }}
+      </button>
+    </div>
+
+    <div class="template-suggestions" *ngIf="!isTemplatesLoading && getSuggestedTemplatePieces(newPieceName).length > 0">
+      <button
+        type="button"
+        class="template-suggestion"
+        *ngFor="let piece of getSuggestedTemplatePieces(newPieceName); trackBy: trackByPiece"
+        [disabled]="isSaving"
+        (click)="selectNewPieceTemplate(piece)">
+        {{ piece }}
+      </button>
+    </div>
+
+    <datalist id="rehearsal-piece-template-list">
+      <option *ngFor="let piece of templatePieces" [value]="piece"></option>
+    </datalist>
+
+    <p class="helper-text" *ngIf="isTemplatesLoading">Vorlagen werden geladen...</p>
+    <p class="helper-text" *ngIf="!isTemplatesLoading && templatePieces.length > 0">{{ templatePieces.length }} Vorlage{{ templatePieces.length === 1 ? '' : 'n' }} verfügbar. Antippen oder weitertippen zum Filtern.</p>
+  </section>
+
+  <p class="status-message" *ngIf="statusMessage" [class.is-success]="statusType === 'success'" [class.is-error]="statusType === 'error'">
+    {{ statusMessage }}
+  </p>
+
+  <section class="pieces-list-card">
+    <div class="section-headline">
+      <h2>Stückliste</h2>
+      <p *ngIf="isAdmin">Du kannst Reihenfolge und Inhalte direkt hier pflegen.</p>
+      <p *ngIf="!isAdmin">Alle Mitglieder sehen hier dieselbe aktuelle Stückliste.</p>
+    </div>
+
+    <div class="piece-skeleton-list" *ngIf="isEventLoading || isUserLoading">
+      <div class="piece-skeleton" *ngFor="let item of skeletonItems">
+        <span class="skeleton-index"></span>
+        <span class="skeleton-line"></span>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isEventLoading && rehearsal && getPieces().length === 0">
+      <h3>Noch keine Stücke hinterlegt</h3>
+      <p *ngIf="isAdmin">Lege die ersten ProbenStücke an, damit alle Mitglieder sie direkt sehen koennen.</p>
+      <p *ngIf="!isAdmin">Sobald Administratoren Stücke hinterlegen, erscheinen sie hier automatisch.</p>
+    </div>
+
+    <div class="piece-list" *ngIf="!isEventLoading && rehearsal && getPieces().length > 0">
+      <article class="piece-card" *ngFor="let piece of getPieces(); let index = index; trackBy: trackByIndex">
+        <div class="piece-order">{{ index + 1 }}</div>
+
+        <div class="piece-content" *ngIf="editingIndex !== index">
+          <strong>{{ piece }}</strong>
+          <span>{{ isAdmin ? 'In Probe und Vorlage verfuegbar' : 'Von der Organisation gepflegt' }}</span>
+        </div>
+
+        <div class="piece-edit-row" *ngIf="editingIndex === index">
+          <input
+            type="text"
+            class="piece-input"
+            name="editingPiece{{ index }}"
+            [(ngModel)]="editingValue"
+            [disabled]="isSaving"
+            list="rehearsal-piece-template-list">
+
+          <button type="button" class="secondary-button" [disabled]="isSaving" (click)="saveEditedPiece()">Speichern</button>
+          <button type="button" class="ghost-button" [disabled]="isSaving" (click)="cancelEditing()">Abbrechen</button>
+        </div>
+
+        <div class="template-suggestions template-suggestions-inline" *ngIf="editingIndex === index && getSuggestedTemplatePieces(editingValue, index).length > 0">
+          <button
+            type="button"
+            class="template-suggestion"
+            *ngFor="let templatePiece of getSuggestedTemplatePieces(editingValue, index); trackBy: trackByPiece"
+            [disabled]="isSaving"
+            (click)="selectEditingTemplate(templatePiece)">
+            {{ templatePiece }}
+          </button>
+        </div>
+
+        <div class="piece-actions" *ngIf="isAdmin && editingIndex !== index">
+          <button type="button" class="ghost-button" [disabled]="isSaving" (click)="startEditing(index)">Bearbeiten</button>
+          <button type="button" class="danger-button" [disabled]="isSaving" (click)="deletePiece(index)">Loeschen</button>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>

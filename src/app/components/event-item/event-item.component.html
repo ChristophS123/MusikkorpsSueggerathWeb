@@ -5,9 +5,14 @@
             <p class="event-datetime">{{ getEventDateLabel() }} · {{ event.time }} Uhr</p>
         </div>
 
-        <a *ngIf="userModel.admin == 1" class="event-admin-link" [routerLink]="['../event-details', eventID]">
-            Details
-        </a>
+        <div class="event-header-links">
+            <a *ngIf="event.training" class="event-secondary-link" [routerLink]="['/proben', event.documentID, 'stuecke']">
+                Stücke
+            </a>
+            <a *ngIf="isAdmin" class="event-admin-link" [routerLink]="['/event-details', event.documentID]">
+                Details
+            </a>
+        </div>
     </div>
 
     <div class="event-status-row">

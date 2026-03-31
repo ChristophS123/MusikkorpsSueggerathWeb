@@ -346,6 +346,7 @@ export class OrganisationPageComponent implements OnInit {
       promised: [...promisedUsers],
       cancelled: [],
       maby: [],
+      pieces: [],
       training: true,
       eventCancelled: false
     };

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Event } from 'src/app/models/event';
-import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { collection, updateDoc, doc } from 'firebase/firestore';
 import { User } from 'src/app/models/user';
 import { RehearsalRoom } from 'src/app/models/rehearsal-room';
@@ -36,6 +36,7 @@ export class EventDetailPageComponent implements OnInit {
     promised: [],
     cancelled: [],
     maby: [],
+    pieces: [],
     training: false,
     eventCancelled: true,
   };
@@ -126,28 +127,28 @@ export class EventDetailPageComponent implements OnInit {
   }
 
   loadEvent() {
-    const eventsCollection = collection(this.firestore, 'events');
-    collectionData(eventsCollection).subscribe((val) => {
-      for(let i = 0; i < val.length; i++) {
-        const eventModel = val[i];
-        const event:Event = {
-          documentID: eventModel['documentID'],
-          name:eventModel['name'],
-          day: eventModel['day'],
-          month: eventModel['month'],
-          year: eventModel['year'],
-          time: eventModel['time'],
-          promised: eventModel['promised'],
-          cancelled: eventModel['cancelled'],
-          maby: eventModel['maby'],
-          training: eventModel['training'],
-          eventCancelled: eventModel['eventCancelled']
-        }
-        if(event.documentID == this.eventID) {
-          this.event = event
-          this.isEventLoading = false;
-        }
+    const eventDocument = doc(this.firestore, 'events', this.eventID);
+    docData(eventDocument).subscribe((eventModel) => {
+      if (!eventModel) {
+        this.isEventLoading = false;
+        return;
       }
+
+      this.event = {
+        documentID: String(eventModel['documentID'] ?? this.eventID),
+        name: String(eventModel['name'] ?? ''),
+        day: Number(eventModel['day'] ?? 0),
+        month: Number(eventModel['month'] ?? 0),
+        year: Number(eventModel['year'] ?? 0),
+        time: String(eventModel['time'] ?? ''),
+        promised: Array.isArray(eventModel['promised']) ? eventModel['promised'].map((userId) => String(userId)) : [],
+        cancelled: Array.isArray(eventModel['cancelled']) ? eventModel['cancelled'].map((userId) => String(userId)) : [],
+        maby: Array.isArray(eventModel['maby']) ? eventModel['maby'].map((userId) => String(userId)) : [],
+        pieces: Array.isArray(eventModel['pieces']) ? eventModel['pieces'].map((piece) => String(piece)) : [],
+        training: Boolean(eventModel['training']),
+        eventCancelled: Boolean(eventModel['eventCancelled'])
+      }
+      this.isEventLoading = false;
     })
     this.loadUsers()
   }

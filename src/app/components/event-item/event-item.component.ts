@@ -1,28 +1,17 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Component, Input } from '@angular/core';
+import { Firestore } from '@angular/fire/firestore';
 import { getAuth } from 'firebase/auth';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { Event } from 'src/app/models/event';
-import { User } from 'src/app/models/user';
 
 @Component({
   selector: 'app-event-item',
   templateUrl: './event-item.component.html',
   styleUrls: ['./event-item.component.scss']
 })
-export class EventItemComponent implements OnInit {
+export class EventItemComponent {
 
-  user:string|undefined = '';
-  userModel:User = {
-    id: '',
-    username: '',
-    email: '',
-    admin: 0,
-    chairID: 0,
-    defaultPromise: false,
-    fcmToken: '',
-    instrument: ''
-  };
+  @Input() isAdmin:boolean = false;
 
   @Input() event:Event = {
     documentID: '',
@@ -34,45 +23,12 @@ export class EventItemComponent implements OnInit {
     promised: [],
     cancelled: [],
     maby: [],
+    pieces: [],
     training: false,
     eventCancelled: true,
   };
 
-  eventID:string = '';
-
-  constructor(private firestore:Firestore) {
-    this.user = getAuth().currentUser?.uid;
-    this.loadUser();
-  }
-
-  ngOnInit(): void {
-    this.eventID = this.event.documentID;
-  }
-
-  loadUser(): void {
-    const usersCollection = collection(this.firestore, 'users');
-    collectionData(usersCollection).subscribe((users) => {
-      for (const userModel of users) {
-        if (this.user === undefined) {
-          continue;
-        }
-
-        if (userModel['id'] === this.user) {
-          this.userModel = {
-            id: userModel['id'],
-            username: userModel['username'],
-            email: userModel['email'],
-            fcmToken: userModel['fcmToken'],
-            admin: userModel['admin'],
-            instrument: userModel['instrument'],
-            chairID: userModel['chairID'],
-            defaultPromise: userModel['defaultPromise']
-          };
-          break;
-        }
-      }
-    });
-  }
+  constructor(private firestore:Firestore) { }
 
   cancel(): void {
     this.updateResponseState('cancelled');
@@ -163,28 +119,30 @@ export class EventItemComponent implements OnInit {
   }
 
   private containsInList(list: string[]): boolean {
-    if (this.user === undefined) {
+    const user = this.getCurrentUserId();
+    if (user === undefined) {
       return false;
     }
 
-    return list.includes(this.user);
+    return list.includes(user);
   }
 
   private updateResponseState(nextState: 'promised' | 'cancelled' | 'maby'): void {
-    if (this.user === undefined || this.event.eventCancelled) {
+    const user = this.getCurrentUserId();
+    if (user === undefined || this.event.eventCancelled) {
       return;
     }
 
-    this.event.promised = this.event.promised.filter((entry) => entry !== this.user);
-    this.event.cancelled = this.event.cancelled.filter((entry) => entry !== this.user);
-    this.event.maby = this.event.maby.filter((entry) => entry !== this.user);
+    this.event.promised = this.event.promised.filter((entry) => entry !== user);
+    this.event.cancelled = this.event.cancelled.filter((entry) => entry !== user);
+    this.event.maby = this.event.maby.filter((entry) => entry !== user);
 
     if (nextState === 'promised') {
-      this.event.promised.push(this.user);
+      this.event.promised.push(user);
     } else if (nextState === 'cancelled') {
-      this.event.cancelled.push(this.user);
+      this.event.cancelled.push(user);
     } else {
-      this.event.maby.push(this.user);
+      this.event.maby.push(user);
     }
 
     const eventCollection = collection(this.firestore, 'events');
@@ -197,6 +155,10 @@ export class EventItemComponent implements OnInit {
 
   private padValue(value: number): string {
     return String(value).padStart(2, '0');
+  }
+
+  private getCurrentUserId(): string | undefined {
+    return getAuth().currentUser?.uid;
   }
 
 }

@@ -19,6 +19,13 @@
     gap: 12px;
 }
 
+.event-header-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
 .event-primary h3,
 .event-primary p {
     margin: 0;
@@ -54,6 +61,19 @@
     text-decoration: none;
     background: #edf5ff;
     color: #0d4f91;
+    font-weight: 700;
+}
+
+.event-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    background: #f4f7fb;
+    color: #355b82;
     font-weight: 700;
 }
 

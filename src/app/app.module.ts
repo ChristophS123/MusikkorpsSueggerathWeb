@@ -27,18 +27,15 @@ import { CreateEventPageComponent } from './main_pages/create-event-page/create-
 import { RehearsalRoomEditorComponent } from './main_pages/rehearsal-room-editor/rehearsal-room-editor.component';
 import { AccountManagementPageComponent } from './main_pages/account-management-page/account-management-page.component';
 import { SongVotingPageComponent } from './main_pages/song-voting-page/song-voting-page.component';
+import { RehearsalPiecesPageComponent } from './main_pages/rehearsal-pieces-page/rehearsal-pieces-page.component';
 import { HttpClientModule } from '@angular/common/http';
-
-NgModule({
-  // ...
-  providers: [{ provide: APP_BASE_HREF, useValue: '/' }]
-})
 
 const allRouts:Routes = [
   { path: 'anmelden', component: LoginPageComponent },
   { path: 'main', component: MainPageComponent },
   { path: 'registrieren', component: SignupPageComponent },
   { path: 'proben', component: TrainingPageComponent },
+  { path: 'proben/:eventID/stuecke', component: RehearsalPiecesPageComponent },
   { path: 'abstimmungen', component: VotingPageComponent },
   { path: 'lied-abstimmungen', component: SongVotingPageComponent },
   { path: 'sonstige-termine', component: RecentEventsComponent },
@@ -72,6 +69,7 @@ const allRouts:Routes = [
     RehearsalRoomEditorComponent,
     AccountManagementPageComponent,
     SongVotingPageComponent,
+    RehearsalPiecesPageComponent,
   ],
   imports: [
     RouterModule.forRoot(allRouts),
@@ -84,6 +82,7 @@ const allRouts:Routes = [
     HttpClientModule,
   ],
   providers: [
+    { provide: APP_BASE_HREF, useValue: '/' }
   ],
   bootstrap: [AppComponent]
 })

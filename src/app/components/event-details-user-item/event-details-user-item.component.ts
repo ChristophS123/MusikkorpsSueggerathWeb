@@ -30,6 +30,7 @@ export class EventDetailsUserItemComponent {
     promised: [],
     cancelled: [],
     maby: [],
+    pieces: [],
     training: false,
     eventCancelled: true,
   };

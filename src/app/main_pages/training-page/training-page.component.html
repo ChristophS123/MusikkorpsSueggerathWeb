@@ -53,7 +53,7 @@
     </div>
 
     <div class="training-cards" *ngIf="!isLoading && trainings.length > 0">
-      <app-event-item *ngFor="let item of trainings" [event]="item"></app-event-item>
+      <app-event-item *ngFor="let item of trainings" [event]="item" [isAdmin]="userModel.admin == 1"></app-event-item>
     </div>
   </section>
 </section>

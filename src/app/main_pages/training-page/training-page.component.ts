@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collectionData } from '@angular/fire/firestore';
+import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { Event } from 'src/app/models/event';
-import { collection } from 'firebase/firestore';
+import { collection, doc, updateDoc } from 'firebase/firestore';
 import { Router } from '@angular/router';
 import { User } from 'src/app/models/user';
 import { getAuth } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
 
 @Component({
   selector: 'app-calendar-page',
@@ -48,34 +47,29 @@ export class TrainingPageComponent implements OnInit {
    }
 
    loadUser() {
-    const eventsCollection = collection(this.firestore, 'users');
-    collectionData(eventsCollection).subscribe((val) => {
-      let hasMatch = false;
+    if (this.user === undefined) {
+      this.isUserLoading = false;
+      return;
+    }
 
-      for(let i = 0; i < val.length; i++) {
-        const mUserModel = val[i];
-        if(this.user == undefined)
-          continue
-        if(mUserModel['id'] == this.user) {
-          hasMatch = true;
-          this.userModel = {
-            id: mUserModel['id'],
-            username: mUserModel['username'],
-            email: mUserModel['email'],
-            fcmToken: mUserModel['fcmToken'],
-            admin: mUserModel['admin'],
-            instrument: mUserModel['instrument'],
-            chairID: mUserModel['chairID'],
-            defaultPromise: mUserModel['defaultPromise']
-          }
-          this.isUserLoading = false;
-          break
-        }
-      }
-
-      if (!hasMatch) {
+    const userDocument = doc(this.firestore, 'users', this.user);
+    docData(userDocument).subscribe((userModel) => {
+      if (!userModel) {
         this.isUserLoading = false;
+        return;
       }
+
+      this.userModel = {
+        id: String(userModel['id'] ?? this.user ?? ''),
+        username: String(userModel['username'] ?? ''),
+        email: String(userModel['email'] ?? ''),
+        fcmToken: String(userModel['fcmToken'] ?? ''),
+        admin: Number(userModel['admin'] ?? 0),
+        instrument: String(userModel['instrument'] ?? ''),
+        chairID: Number(userModel['chairID'] ?? 0),
+        defaultPromise: Boolean(userModel['defaultPromise'])
+      }
+      this.isUserLoading = false;
     })
    }
 
@@ -117,6 +111,7 @@ export class TrainingPageComponent implements OnInit {
           promised: eventModel['promised'],
           cancelled: eventModel['cancelled'],
           maby: eventModel['maby'],
+          pieces: Array.isArray(eventModel['pieces']) ? eventModel['pieces'].map((piece) => String(piece)) : [],
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }

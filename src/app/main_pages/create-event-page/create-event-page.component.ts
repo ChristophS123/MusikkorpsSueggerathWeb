@@ -52,6 +52,7 @@ export class CreateEventPageComponent {
         promised:[],
         cancelled:[],
         maby: [],
+        pieces: [],
         training:false,
         eventCancelled:false
       };
