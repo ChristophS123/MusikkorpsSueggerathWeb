@@ -96,7 +96,6 @@
         <div class="piece-content" *ngIf="editingIndex !== index">
           <strong>{{ piece.name }}</strong>
           <p *ngIf="piece.description" class="piece-description">{{ piece.description }}</p>
-          <span>{{ isAdmin ? 'In Probe und Vorlage verfuegbar' : 'Von der Organisation gepflegt' }}</span>
         </div>
 
         <div class="piece-edit-row" *ngIf="editingIndex === index">
