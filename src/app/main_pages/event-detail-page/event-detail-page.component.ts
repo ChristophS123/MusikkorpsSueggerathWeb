@@ -5,6 +5,7 @@ import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { collection, updateDoc, doc } from 'firebase/firestore';
 import { User } from 'src/app/models/user';
 import { RehearsalRoom } from 'src/app/models/rehearsal-room';
+import { normalizeRehearsalPieces } from 'src/app/models/rehearsal-piece';
 import { RehearsalRoomService } from 'src/app/services/rehearsal-room.service';
 
 interface UserGroup {
@@ -144,7 +145,7 @@ export class EventDetailPageComponent implements OnInit {
         promised: Array.isArray(eventModel['promised']) ? eventModel['promised'].map((userId) => String(userId)) : [],
         cancelled: Array.isArray(eventModel['cancelled']) ? eventModel['cancelled'].map((userId) => String(userId)) : [],
         maby: Array.isArray(eventModel['maby']) ? eventModel['maby'].map((userId) => String(userId)) : [],
-        pieces: Array.isArray(eventModel['pieces']) ? eventModel['pieces'].map((piece) => String(piece)) : [],
+        pieces: normalizeRehearsalPieces(eventModel['pieces']),
         training: Boolean(eventModel['training']),
         eventCancelled: Boolean(eventModel['eventCancelled'])
       }

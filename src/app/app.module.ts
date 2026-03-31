@@ -36,6 +36,7 @@ const allRouts:Routes = [
   { path: 'registrieren', component: SignupPageComponent },
   { path: 'proben', component: TrainingPageComponent },
   { path: 'proben/:eventID/stuecke', component: RehearsalPiecesPageComponent },
+  { path: 'sonstige-termine/:eventID/stuecke', component: RehearsalPiecesPageComponent },
   { path: 'abstimmungen', component: VotingPageComponent },
   { path: 'lied-abstimmungen', component: SongVotingPageComponent },
   { path: 'sonstige-termine', component: RecentEventsComponent },

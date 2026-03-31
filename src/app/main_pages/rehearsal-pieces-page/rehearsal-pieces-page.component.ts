@@ -4,6 +4,7 @@ import { Firestore, docData } from '@angular/fire/firestore';
 import { ActivatedRoute, Router } from '@angular/router';
 import { doc } from 'firebase/firestore';
 import { Event } from 'src/app/models/event';
+import { RehearsalPiece, getRehearsalPieceComparisonKey, normalizeRehearsalPieceDescription, normalizeRehearsalPieceName } from 'src/app/models/rehearsal-piece';
 import { RehearsalPiecesService } from 'src/app/services/rehearsal-pieces.service';
 
 @Component({
@@ -17,8 +18,10 @@ export class RehearsalPiecesPageComponent implements OnInit {
   rehearsal:Event | null = null;
   templatePieces:string[] = [];
   newPieceName:string = '';
+  newPieceDescription:string = '';
   editingIndex:number = -1;
-  editingValue:string = '';
+  editingName:string = '';
+  editingDescription:string = '';
   isEventLoading:boolean = true;
   isTemplatesLoading:boolean = true;
   isUserLoading:boolean = true;
@@ -44,26 +47,33 @@ export class RehearsalPiecesPageComponent implements OnInit {
   }
 
   onBackPressed(): void {
-    this.router.navigate(['proben']);
+    this.router.navigate([this.getBackRoute()]);
   }
 
   async addPiece(): Promise<void> {
-    const normalizedPiece = this.normalizePiece(this.newPieceName);
+    const normalizedPieceName = normalizeRehearsalPieceName(this.newPieceName);
+    const normalizedPieceDescription = normalizeRehearsalPieceDescription(this.newPieceDescription);
     if (!this.isAdmin) {
       this.setStatus('error', 'Nur Administratoren können Stücke bearbeiten.');
       return;
     }
-    if (normalizedPiece.length === 0) {
+    if (normalizedPieceName.length === 0) {
       this.setStatus('error', 'Bitte zuerst einen Stücknamen eingeben.');
       return;
     }
-    if (this.isDuplicatePiece(normalizedPiece)) {
+    if (this.isDuplicatePiece(normalizedPieceName)) {
       this.setStatus('error', 'Dieses Stück ist bereits in der Probe hinterlegt.');
       return;
     }
 
-    await this.persistPieces([...this.getPieces(), normalizedPiece], normalizedPiece, 'Stück wurde hinzugefügt.');
+    const nextPiece:RehearsalPiece = {
+      name: normalizedPieceName,
+      description: normalizedPieceDescription
+    };
+
+    await this.persistPieces([...this.getPieces(), nextPiece], normalizedPieceName, 'Stück wurde hinzugefügt.');
     this.newPieceName = '';
+    this.newPieceDescription = '';
   }
 
   startEditing(index:number): void {
@@ -72,34 +82,40 @@ export class RehearsalPiecesPageComponent implements OnInit {
     }
 
     this.editingIndex = index;
-    this.editingValue = this.getPieces()[index] ?? '';
+    this.editingName = this.getPieces()[index]?.name ?? '';
+    this.editingDescription = this.getPieces()[index]?.description ?? '';
     this.clearStatus();
   }
 
   cancelEditing(): void {
     this.editingIndex = -1;
-    this.editingValue = '';
+    this.editingName = '';
+    this.editingDescription = '';
   }
 
   async saveEditedPiece(): Promise<void> {
-    const normalizedPiece = this.normalizePiece(this.editingValue);
+    const normalizedPieceName = normalizeRehearsalPieceName(this.editingName);
+    const normalizedPieceDescription = normalizeRehearsalPieceDescription(this.editingDescription);
     if (this.editingIndex < 0) {
       return;
     }
-    if (normalizedPiece.length === 0) {
+    if (normalizedPieceName.length === 0) {
       this.setStatus('error', 'Bitte einen gültigen Stücknamen eingeben.');
       return;
     }
 
     const nextPieces = [...this.getPieces()];
-    const duplicateIndex = nextPieces.findIndex((piece, index) => index !== this.editingIndex && this.toComparisonKey(piece) === this.toComparisonKey(normalizedPiece));
+    const duplicateIndex = nextPieces.findIndex((piece, index) => index !== this.editingIndex && this.toComparisonKey(piece.name) === this.toComparisonKey(normalizedPieceName));
     if (duplicateIndex >= 0) {
       this.setStatus('error', 'Dieses Stück ist bereits in der Liste vorhanden.');
       return;
     }
 
-    nextPieces[this.editingIndex] = normalizedPiece;
-    await this.persistPieces(nextPieces, normalizedPiece, 'Stück wurde aktualisiert.');
+    nextPieces[this.editingIndex] = {
+      name: normalizedPieceName,
+      description: normalizedPieceDescription
+    };
+    await this.persistPieces(nextPieces, normalizedPieceName, 'Stück wurde aktualisiert.');
     this.cancelEditing();
   }
 
@@ -117,14 +133,30 @@ export class RehearsalPiecesPageComponent implements OnInit {
 
   getPieceCountLabel(): string {
     const pieceCount = this.getPieces().length;
-    return `${pieceCount} Stück${pieceCount === 1 ? '' : 'e'} für diese Probe`;
+    return `${pieceCount} Stück${pieceCount === 1 ? '' : 'e'} für diesen ${this.getEventTypeLabel()}`;
   }
 
   getModeLabel(): string {
     return this.isAdmin ? 'Admin-Modus: Liste bearbeiten' : 'Mitgliederansicht: Liste nur lesen';
   }
 
-  getPieces(): string[] {
+  getEventTypeLabel(): string {
+    return this.rehearsal?.training ? 'Probe' : 'Termin';
+  }
+
+  getHeroEyebrow(): string {
+    return this.rehearsal?.training ? 'Probenplanung' : 'Terminplanung';
+  }
+
+  getEventLabelPlural(): string {
+    return this.rehearsal?.training ? 'Proben' : 'Termine';
+  }
+
+  getBackRoute(): string {
+    return this.rehearsal?.training ? 'proben' : 'sonstige-termine';
+  }
+
+  getPieces(): RehearsalPiece[] {
     return this.rehearsal?.pieces ?? [];
   }
 
@@ -133,7 +165,7 @@ export class RehearsalPiecesPageComponent implements OnInit {
 
     return this.templatePieces
       .filter((piece) => comparisonSearchValue.length === 0 || this.toComparisonKey(piece).includes(comparisonSearchValue))
-      .filter((piece) => !this.getPieces().some((existingPiece, index) => index !== excludeIndex && this.toComparisonKey(existingPiece) === this.toComparisonKey(piece)))
+      .filter((piece) => !this.getPieces().some((existingPiece, index) => index !== excludeIndex && this.toComparisonKey(existingPiece.name) === this.toComparisonKey(piece)))
       .slice(0, 6);
   }
 
@@ -143,7 +175,7 @@ export class RehearsalPiecesPageComponent implements OnInit {
   }
 
   selectEditingTemplate(pieceName:string): void {
-    this.editingValue = pieceName;
+    this.editingName = pieceName;
     this.clearStatus();
   }
 
@@ -153,6 +185,10 @@ export class RehearsalPiecesPageComponent implements OnInit {
 
   trackByPiece(_:number, piece:string): string {
     return piece;
+  }
+
+  trackByRehearsalPiece(_:number, piece:RehearsalPiece): string {
+    return `${piece.name}_${piece.description}`;
   }
 
   private loadUser(): void {
@@ -186,7 +222,7 @@ export class RehearsalPiecesPageComponent implements OnInit {
     });
   }
 
-  private async persistPieces(nextPieces:string[], templatePiece:string, successMessage:string): Promise<void> {
+  private async persistPieces(nextPieces:RehearsalPiece[], templatePiece:string, successMessage:string): Promise<void> {
     if (!this.rehearsal || this.isSaving) {
       return;
     }
@@ -215,7 +251,7 @@ export class RehearsalPiecesPageComponent implements OnInit {
   }
 
   private mergeTemplatePiece(pieceName:string): void {
-    const normalizedPiece = this.normalizePiece(pieceName);
+    const normalizedPiece = normalizeRehearsalPieceName(pieceName);
     if (normalizedPiece.length === 0) {
       return;
     }
@@ -228,15 +264,11 @@ export class RehearsalPiecesPageComponent implements OnInit {
   }
 
   private isDuplicatePiece(pieceName:string): boolean {
-    return this.getPieces().some((piece) => this.toComparisonKey(piece) === this.toComparisonKey(pieceName));
-  }
-
-  private normalizePiece(pieceName:string): string {
-    return pieceName.replace(/\s+/g, ' ').trim();
+    return this.getPieces().some((piece) => this.toComparisonKey(piece.name) === this.toComparisonKey(pieceName));
   }
 
   private toComparisonKey(pieceName:string): string {
-    return this.normalizePiece(pieceName).toLocaleLowerCase('de');
+    return getRehearsalPieceComparisonKey(pieceName);
   }
 
   private setStatus(type:'success' | 'error' | '', message:string): void {

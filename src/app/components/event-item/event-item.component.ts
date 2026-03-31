@@ -58,6 +58,16 @@ export class EventItemComponent {
     return `${this.padValue(this.event.day)}.${this.padValue(this.event.month)}.${this.event.year}`;
   }
 
+  getPiecesRoute(): string[] {
+    return this.event.training
+      ? ['/proben', this.event.documentID, 'stuecke']
+      : ['/sonstige-termine', this.event.documentID, 'stuecke'];
+  }
+
+  getPiecesLinkLabel(): string {
+    return this.event.pieces.length > 0 ? `Stuecke (${this.event.pieces.length})` : 'Stuecke';
+  }
+
   getStatusLabel(): string {
     if (this.event.eventCancelled) {
       return 'Abgesagt';

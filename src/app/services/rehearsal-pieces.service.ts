@@ -3,6 +3,7 @@ import { Firestore, docData } from '@angular/fire/firestore';
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { Observable, map, shareReplay } from 'rxjs';
 import { Event } from '../models/event';
+import { RehearsalPiece, normalizeRehearsalPieceName, normalizeRehearsalPieces } from '../models/rehearsal-piece';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,7 @@ export class RehearsalPiecesService {
           promised: this.toStringArray(eventModel['promised']),
           cancelled: this.toStringArray(eventModel['cancelled']),
           maby: this.toStringArray(eventModel['maby']),
-          pieces: this.normalizePieces(this.toStringArray(eventModel['pieces']), false),
+          pieces: normalizeRehearsalPieces(eventModel['pieces']),
           training: Boolean(eventModel['training']),
           eventCancelled: Boolean(eventModel['eventCancelled'])
         };
@@ -42,7 +43,7 @@ export class RehearsalPiecesService {
   getTemplatePieces(): Observable<string[]> {
     if (!this.templatePieces$) {
       this.templatePieces$ = docData(doc(this.firestore, ...this.templateDocumentPath)).pipe(
-        map((templateModel) => this.normalizePieces(this.toStringArray(templateModel?.['items']), true)),
+        map((templateModel) => this.normalizePieceNames(this.toStringArray(templateModel?.['items']), true)),
         shareReplay({ bufferSize: 1, refCount: true })
       );
     }
@@ -50,14 +51,14 @@ export class RehearsalPiecesService {
     return this.templatePieces$;
   }
 
-  async saveEventPieces(eventId:string, pieces:string[]): Promise<void> {
+  async saveEventPieces(eventId:string, pieces:RehearsalPiece[]): Promise<void> {
     await updateDoc(doc(this.firestore, 'events', eventId), {
-      pieces: this.normalizePieces(pieces, false)
+      pieces: normalizeRehearsalPieces(pieces)
     });
   }
 
   async savePieceTemplate(pieceName:string): Promise<void> {
-    const normalizedPiece = this.normalizePiece(pieceName);
+    const normalizedPiece = normalizeRehearsalPieceName(pieceName);
     if (normalizedPiece.length === 0) {
       return;
     }
@@ -75,11 +76,11 @@ export class RehearsalPiecesService {
     return value.map((entry) => String(entry));
   }
 
-  private normalizePieces(pieces:string[], sortAlphabetically:boolean): string[] {
+  private normalizePieceNames(pieces:string[], sortAlphabetically:boolean): string[] {
     const uniquePieces = new Map<string, string>();
 
     for (const piece of pieces) {
-      const normalizedPiece = this.normalizePiece(piece);
+      const normalizedPiece = normalizeRehearsalPieceName(piece);
       if (normalizedPiece.length === 0) {
         continue;
       }
@@ -96,9 +97,5 @@ export class RehearsalPiecesService {
     }
 
     return normalizedPieces;
-  }
-
-  private normalizePiece(pieceName:string): string {
-    return pieceName.replace(/\s+/g, ' ').trim();
   }
 }

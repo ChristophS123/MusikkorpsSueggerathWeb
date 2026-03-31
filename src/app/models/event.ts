@@ -1,3 +1,5 @@
+import { RehearsalPiece } from './rehearsal-piece';
+
 export interface Event {
     documentID:string;
     name:string
@@ -8,7 +10,7 @@ export interface Event {
     promised:string[];
     cancelled:string[];
     maby:string[];
-    pieces:string[];
+    pieces:RehearsalPiece[];
     training:boolean;
     eventCancelled:boolean;
 }

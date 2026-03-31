@@ -6,8 +6,8 @@
         </div>
 
         <div class="event-header-links">
-            <a *ngIf="event.training" class="event-secondary-link" [routerLink]="['/proben', event.documentID, 'stuecke']">
-                Stücke
+            <a class="event-secondary-link" [routerLink]="getPiecesRoute()">
+                {{ getPiecesLinkLabel() }}
             </a>
             <a *ngIf="isAdmin" class="event-admin-link" [routerLink]="['/event-details', event.documentID]">
                 Details

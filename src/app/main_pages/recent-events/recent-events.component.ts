@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { Event } from 'src/app/models/event';
+import { normalizeRehearsalPieces } from 'src/app/models/rehearsal-piece';
 import { getAuth } from 'firebase/auth';
 import { collection, doc } from 'firebase/firestore';
 import { Router } from '@angular/router';
@@ -52,7 +53,7 @@ export class RecentEventsComponent implements OnInit {
           promised: eventModel['promised'],
           cancelled: eventModel['cancelled'],
           maby: eventModel['maby'],
-          pieces: Array.isArray(eventModel['pieces']) ? eventModel['pieces'].map((piece) => String(piece)) : [],
+          pieces: normalizeRehearsalPieces(eventModel['pieces']),
           training: eventModel['training'],
           eventCancelled: eventModel['eventCancelled']
         }
