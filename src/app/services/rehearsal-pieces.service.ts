@@ -3,6 +3,7 @@ import { Firestore, docData } from '@angular/fire/firestore';
 import { arrayUnion, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { Observable, map, shareReplay } from 'rxjs';
 import { Event } from '../models/event';
+import { mapEventFromFirestore } from '../models/event-mapper';
 import { RehearsalPiece, normalizeRehearsalPieceName, normalizeRehearsalPieces } from '../models/rehearsal-piece';
 
 @Injectable({
@@ -22,20 +23,7 @@ export class RehearsalPiecesService {
           return null;
         }
 
-        return {
-          documentID: String(eventModel['documentID'] ?? eventId),
-          name: String(eventModel['name'] ?? ''),
-          day: Number(eventModel['day'] ?? 0),
-          month: Number(eventModel['month'] ?? 0),
-          year: Number(eventModel['year'] ?? 0),
-          time: String(eventModel['time'] ?? ''),
-          promised: this.toStringArray(eventModel['promised']),
-          cancelled: this.toStringArray(eventModel['cancelled']),
-          maby: this.toStringArray(eventModel['maby']),
-          pieces: normalizeRehearsalPieces(eventModel['pieces']),
-          training: Boolean(eventModel['training']),
-          eventCancelled: Boolean(eventModel['eventCancelled'])
-        };
+        return mapEventFromFirestore(eventModel as Record<string, unknown>, eventId);
       })
     );
   }

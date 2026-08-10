@@ -2,7 +2,10 @@
 
 <app-main-nav></app-main-nav>
 
-<!-- Main Page -->
+<section style="margin-bottom: 64px;" class="news-banner" *ngIf="isNewsBannerVisible()">
+    <h2>{{ newsBanner.title }}</h2>
+    <p>{{ newsBanner.description }}</p>
+</section>
 
 <section class="main-page">
     <div class="icon">

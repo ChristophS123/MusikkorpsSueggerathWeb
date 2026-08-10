@@ -44,7 +44,7 @@
     <article class="tool-card training-generator-card">
       <div class="section-headline">
         <h2>Proben generieren</h2>
-        <p>Erstellt automatisch neue Montagsproben um 19:00 Uhr auf Basis der letzten vorhandenen Probe.</p>
+        <p>Erstellt automatisch neue Montagsproben um 19:00 Uhr. Normal direkt nach der letzten Probe, oder mit Ausfall ab einem gewaehlten Montag.</p>
       </div>
 
       <label class="generator-field" for="trainingCount">
@@ -57,9 +57,62 @@
         >
       </label>
 
-      <button class="primary-action" type="button" (click)="generateTrainings()" [disabled]="isGeneratingTrainings">
-        {{ isGeneratingTrainings ? 'Proben werden erstellt...' : 'Proben generieren' }}
-      </button>
+      <div class="quick-actions">
+        <button class="primary-action" type="button" (click)="generateTrainings()" [disabled]="isGeneratingTrainings">
+          {{ isGeneratingTrainings ? 'Proben werden erstellt...' : 'Proben generieren' }}
+        </button>
+        <button class="secondary-action" type="button" (click)="toggleBreakTrainingCalendar()" [disabled]="isGeneratingTrainings">
+          {{ showBreakTrainingCalendar ? 'Kalender schliessen' : 'Proben mit Ausfall generieren' }}
+        </button>
+      </div>
+
+      <div class="break-training-panel" *ngIf="showBreakTrainingCalendar">
+        <div class="section-headline">
+          <h3>Startmontag nach Ausfall</h3>
+          <p>Waehle den Montag, an dem die naechste Probe stattfinden soll. Andere Wochentage und Montage mit vorhandener Probe sind nicht auswaehlbar.</p>
+        </div>
+
+        <div class="monday-calendar">
+          <div class="calendar-header">
+            <button class="calendar-nav-button" type="button" (click)="shiftCalendarMonth(-1)" aria-label="Vorheriger Monat">‹</button>
+            <strong>{{ getCalendarMonthLabel() }}</strong>
+            <button class="calendar-nav-button" type="button" (click)="shiftCalendarMonth(1)" aria-label="Naechster Monat">›</button>
+          </div>
+
+          <div class="calendar-weekdays">
+            <span *ngFor="let weekdayLabel of calendarWeekdayLabels">{{ weekdayLabel }}</span>
+          </div>
+
+          <div class="calendar-grid">
+            <button
+              *ngFor="let day of calendarDays"
+              type="button"
+              class="calendar-day"
+              [class.is-outside-month]="!day.isCurrentMonth"
+              [class.is-monday]="day.isMonday"
+              [class.is-occupied]="day.hasExistingTraining"
+              [class.is-selectable]="day.isSelectable"
+              [class.is-selected]="day.isSelected"
+              [disabled]="!day.isSelectable"
+              [attr.title]="day.hasExistingTraining ? 'An diesem Montag gibt es bereits eine Probe' : null"
+              (click)="selectBreakStartDate(day)"
+            >
+              {{ day.dayNumber }}
+            </button>
+          </div>
+        </div>
+
+        <p class="selected-break-date">{{ getSelectedBreakStartDateLabel() }}</p>
+
+        <button
+          class="primary-action"
+          type="button"
+          (click)="generateTrainingsWithBreak()"
+          [disabled]="isGeneratingTrainings || !selectedBreakStartDate"
+        >
+          {{ isGeneratingTrainings ? 'Proben werden erstellt...' : 'Ab gewaehltem Montag generieren' }}
+        </button>
+      </div>
 
       <p class="generator-message" *ngIf="trainingGenerationMessage">{{ trainingGenerationMessage }}</p>
     </article>
@@ -113,6 +166,45 @@
           <button class="delete-song-button" type="button" (click)="deleteSongVotingOption(songOption.id)">Entfernen</button>
         </article>
       </div>
+    </article>
+  </section>
+
+  <section class="admin-tools-grid">
+    <article class="tool-card news-banner-card">
+      <div class="section-headline">
+        <h2>News Banner</h2>
+        <p>Titel und Beschreibung fuer einen Hinweis auf der Startseite. Nur sichtbar, wenn das Banner aktiviert ist.</p>
+      </div>
+
+      <div class="account-entry-meta">
+        <span class="entry-pill">{{ getNewsBannerStatusLabel() }}</span>
+      </div>
+
+      <label class="generator-field" for="newsBannerTitle">
+        <span>Titel</span>
+        <input id="newsBannerTitle" type="text" [(ngModel)]="newsBannerTitle" placeholder="z. B. Wichtige Info">
+      </label>
+
+      <label class="generator-field" for="newsBannerDescription">
+        <span>Beschreibung</span>
+        <textarea
+          id="newsBannerDescription"
+          rows="4"
+          [(ngModel)]="newsBannerDescription"
+          placeholder="Info für alle Mitglieder"
+        ></textarea>
+      </label>
+
+      <label class="news-banner-toggle" for="newsBannerEnabled">
+        <input id="newsBannerEnabled" type="checkbox" [(ngModel)]="newsBannerEnabled">
+        <span>News Banner auf der Startseite anzeigen</span>
+      </label>
+
+      <button class="primary-action" type="button" (click)="saveNewsBanner()" [disabled]="isSavingNewsBanner">
+        {{ isSavingNewsBanner ? 'Wird gespeichert...' : 'News Banner speichern' }}
+      </button>
+
+      <p class="generator-message" *ngIf="newsBannerMessage">{{ newsBannerMessage }}</p>
     </article>
   </section>
 </section>

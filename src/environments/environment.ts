@@ -1,5 +1,7 @@
 export const environment = {
     production: false,
+    // Lokal: absolute URL zur deployed Vercel-API. Produktiv: leer = gleiche Domain.
+    apiBaseUrl: 'https://musikkorpssueggerath.vercel.app',
     firebase : {
         apiKey: "AIzaSyBJZdRRa6bhQkdJ5e-rCg1Frb1UgOn7bdk",
         authDomain: "musikkorpsminus.firebaseapp.com",

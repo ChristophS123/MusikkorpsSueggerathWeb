@@ -134,6 +134,76 @@
     color: #c03a46;
 }
 
+.response-options-section {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 18px;
+    background: #f8fbff;
+    border: 1px solid #e2eaf2;
+}
+
+.response-options-section h3 {
+    margin: 0;
+    color: #17324d;
+    font-size: 1.05rem;
+}
+
+.response-options-list,
+.add-option-row {
+    display: grid;
+    gap: 10px;
+}
+
+.response-option-item,
+.add-option-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.response-option-item input[type="text"],
+.add-option-row input[type="text"] {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #fff;
+    color: #17324d;
+}
+
+.response-option-item input[type="color"],
+.add-option-row input[type="color"] {
+    width: 52px;
+    height: 52px;
+    padding: 4px;
+    border: 1px solid #d7e1eb;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.remove-option-button,
+.secondary-action {
+    min-height: 52px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.remove-option-button {
+    background: rgba(220, 53, 69, 0.12);
+    color: #c03a46;
+}
+
+.secondary-action {
+    background: #edf3f8;
+    color: #24425e;
+}
+
 .submit-button {
     min-height: 52px;
     border: none;

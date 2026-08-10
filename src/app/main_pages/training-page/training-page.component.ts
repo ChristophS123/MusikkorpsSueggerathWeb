@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { Event } from 'src/app/models/event';
-import { normalizeRehearsalPieces } from 'src/app/models/rehearsal-piece';
+import { mapEventFromFirestore } from 'src/app/models/event-mapper';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { Router } from '@angular/router';
 import { User } from 'src/app/models/user';
@@ -101,26 +101,11 @@ export class TrainingPageComponent implements OnInit {
       const upcomingTrainings: Event[] = [];
 
       for(let i = 0; i < val.length; i++) {
-        const eventModel = val[i];
-        const event:Event = {
-          documentID: eventModel['documentID'],
-          name:eventModel['name'],
-          day: eventModel['day'],
-          month: eventModel['month'],
-          year: eventModel['year'],
-          time: eventModel['time'],
-          promised: eventModel['promised'],
-          cancelled: eventModel['cancelled'],
-          maby: eventModel['maby'],
-          pieces: normalizeRehearsalPieces(eventModel['pieces']),
-          training: eventModel['training'],
-          eventCancelled: eventModel['eventCancelled']
-        }
+        const event = mapEventFromFirestore(val[i] as Record<string, unknown>);
 
-        const eventDate = this.getEventDate(event);
-        const currentDate = new Date()
-        if(currentDate.getTime() > eventDate.getTime())
-          continue
+        if (this.isEventDayOver(event)) {
+          continue;
+        }
         if(!event.training)
           continue
 
@@ -152,6 +137,11 @@ export class TrainingPageComponent implements OnInit {
       0,
       0
     );
+  }
+
+  private isEventDayOver(event: Event): boolean {
+    const endOfEventDay = new Date(event.year, event.month - 1, event.day, 23, 59, 59, 999);
+    return Date.now() > endOfEventDay.getTime();
   }
 
   getNextTrainingLabel(): string {

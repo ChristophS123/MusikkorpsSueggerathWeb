@@ -1,12 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Event } from 'src/app/models/event';
+import { mapEventFromFirestore } from 'src/app/models/event-mapper';
 import { Firestore, collectionData, docData } from '@angular/fire/firestore';
 import { collection, updateDoc, doc } from 'firebase/firestore';
 import { User } from 'src/app/models/user';
 import { RehearsalRoom } from 'src/app/models/rehearsal-room';
-import { normalizeRehearsalPieces } from 'src/app/models/rehearsal-piece';
 import { RehearsalRoomService } from 'src/app/services/rehearsal-room.service';
+import { EventReminderService } from 'src/app/services/event-reminder.service';
+import {
+  createEmptyResponses,
+  createResponseOption,
+  EventResponseOption,
+  EventResponses,
+  getLegacyResponseArrays,
+  getRespondedUserIds,
+  getResponseOptionById,
+  getSelectedResponseOptionId,
+  normalizeOptionColor
+} from 'src/app/models/event-response-option';
+import { FirebaseError } from 'firebase/app';
 
 interface UserGroup {
   title: string;
@@ -34,13 +47,32 @@ export class EventDetailPageComponent implements OnInit {
     month: 0,
     year: 0,
     time: '',
+    meetingTime: '',
+    meetingLocation: '',
     promised: [],
     cancelled: [],
     maby: [],
+    responseOptions: [],
+    responses: {},
     pieces: [],
     training: false,
     eventCancelled: true,
   };
+
+  timeDraft:string = '';
+  meetingTimeDraft:string = '';
+  meetingLocationDraft:string = '';
+  isSavingMeetingInfo:boolean = false;
+  meetingInfoMessage:string = '';
+
+  responseOptionsDraft:EventResponseOption[] = [];
+  newOptionLabel:string = '';
+  newOptionColor:string = '#0a66c2';
+  isSavingResponseOptions:boolean = false;
+  responseOptionsMessage:string = '';
+  isSendingTestReminder:boolean = false;
+  isSendingAllReminders:boolean = false;
+  reminderMessage:string = '';
 
   room: RehearsalRoom | null = null;
   allUsers: User[] = [];
@@ -59,7 +91,8 @@ export class EventDetailPageComponent implements OnInit {
     private activatedRoute:ActivatedRoute, 
     private router:Router, 
     private firestore:Firestore,
-    private rehearsalRoomService: RehearsalRoomService
+    private rehearsalRoomService: RehearsalRoomService,
+    private eventReminderService: EventReminderService
   ) {  }
   
   ngOnInit(): void {
@@ -81,50 +114,49 @@ export class EventDetailPageComponent implements OnInit {
     this.viewMode = this.viewMode === 'list' ? 'room' : 'list';
   }
 
-  getUserStatus(userId: string): 'promised' | 'cancelled' | 'maybe' | 'pending' {
+  getSelectedOption(userId: string): EventResponseOption | null {
+    if (!this.event.training && this.event.responseOptions.length > 0) {
+      return getResponseOptionById(
+        this.event.responseOptions,
+        getSelectedResponseOptionId(this.event.responses, userId)
+      );
+    }
+
     if (this.event.promised.includes(userId)) {
-      return 'promised';
+      return { id: 'promised', label: 'Zugesagt', color: '#28a745' };
     }
 
     if (this.event.cancelled.includes(userId)) {
-      return 'cancelled';
+      return { id: 'cancelled', label: 'Abgesagt', color: '#dc3545' };
     }
 
     if (this.event.maby.includes(userId)) {
-      return 'maybe';
+      return { id: 'maby', label: '?', color: '#ffc107' };
     }
 
-    return 'pending';
+    return null;
   }
 
   getStatusColor(userId: string): string {
-    const status = this.getUserStatus(userId);
-    switch (status) {
-      case 'promised': return '#28a745';
-      case 'cancelled': return '#dc3545';
-      case 'maybe': return '#ffc107';
-      default: return '#9aa6b2';
-    }
+    return this.getSelectedOption(userId)?.color ?? '#9aa6b2';
   }
 
   getStatusText(userId: string): string {
-    const status = this.getUserStatus(userId);
-    switch (status) {
-      case 'promised': return '✓';
-      case 'cancelled': return '✗';
-      case 'maybe': return '?';
-      default: return '•';
+    const selectedOption = this.getSelectedOption(userId);
+    if (!selectedOption) {
+      return '•';
     }
+
+    const label = selectedOption.label.trim();
+    if (label.length <= 2) {
+      return label;
+    }
+
+    return label.charAt(0).toUpperCase();
   }
 
   getStatusLabel(userId: string): string {
-    const status = this.getUserStatus(userId);
-    switch (status) {
-      case 'promised': return 'Zugesagt';
-      case 'cancelled': return 'Abgesagt';
-      case 'maybe': return 'Vielleicht';
-      default: return 'Ausstehend';
-    }
+    return this.getSelectedOption(userId)?.label ?? 'Ausstehend';
   }
 
   loadEvent() {
@@ -135,23 +167,160 @@ export class EventDetailPageComponent implements OnInit {
         return;
       }
 
-      this.event = {
-        documentID: String(eventModel['documentID'] ?? this.eventID),
-        name: String(eventModel['name'] ?? ''),
-        day: Number(eventModel['day'] ?? 0),
-        month: Number(eventModel['month'] ?? 0),
-        year: Number(eventModel['year'] ?? 0),
-        time: String(eventModel['time'] ?? ''),
-        promised: Array.isArray(eventModel['promised']) ? eventModel['promised'].map((userId) => String(userId)) : [],
-        cancelled: Array.isArray(eventModel['cancelled']) ? eventModel['cancelled'].map((userId) => String(userId)) : [],
-        maby: Array.isArray(eventModel['maby']) ? eventModel['maby'].map((userId) => String(userId)) : [],
-        pieces: normalizeRehearsalPieces(eventModel['pieces']),
-        training: Boolean(eventModel['training']),
-        eventCancelled: Boolean(eventModel['eventCancelled'])
+      const mappedEvent = mapEventFromFirestore(eventModel as Record<string, unknown>, this.eventID);
+      const shouldSyncMeetingDrafts =
+        this.timeDraft === this.event.time
+        && this.meetingTimeDraft === this.event.meetingTime
+        && this.meetingLocationDraft === this.event.meetingLocation;
+      const shouldSyncResponseOptions =
+        JSON.stringify(this.responseOptionsDraft) === JSON.stringify(this.event.responseOptions);
+
+      this.event = mappedEvent;
+
+      if (shouldSyncMeetingDrafts) {
+        this.timeDraft = this.event.time;
+        this.meetingTimeDraft = this.event.meetingTime;
+        this.meetingLocationDraft = this.event.meetingLocation;
       }
+
+      if (shouldSyncResponseOptions) {
+        this.responseOptionsDraft = this.event.responseOptions.map((option) => ({ ...option }));
+      }
+
       this.isEventLoading = false;
     })
     this.loadUsers()
+  }
+
+  hasEventTime(): boolean {
+    return this.event.time.trim().length > 0;
+  }
+
+  clearEventTime(): void {
+    this.timeDraft = '';
+    this.meetingInfoMessage = '';
+  }
+
+  clearMeetingTime(): void {
+    this.meetingTimeDraft = '';
+    this.meetingInfoMessage = '';
+  }
+
+  hasMeetingTime(): boolean {
+    return this.event.meetingTime.trim().length > 0;
+  }
+
+  hasMeetingLocation(): boolean {
+    return this.event.meetingLocation.trim().length > 0;
+  }
+
+  hasMeetingInfo(): boolean {
+    return this.hasMeetingTime() || this.hasMeetingLocation();
+  }
+
+  async saveMeetingInfo(): Promise<void> {
+    if (this.event.training || this.isSavingMeetingInfo || !this.event.documentID) {
+      return;
+    }
+
+    this.isSavingMeetingInfo = true;
+    this.meetingInfoMessage = '';
+
+    try {
+      const time = this.timeDraft.trim();
+      const meetingTime = this.meetingTimeDraft.trim();
+      const meetingLocation = this.meetingLocationDraft.trim();
+      const eventCollection = collection(this.firestore, 'events');
+      await updateDoc(doc(eventCollection, this.event.documentID), {
+        time,
+        meetingTime,
+        meetingLocation
+      });
+      this.meetingInfoMessage = 'Termininfos wurden gespeichert.';
+    } catch (error) {
+      console.error(error);
+      this.meetingInfoMessage = 'Termininfos konnten nicht gespeichert werden.';
+    } finally {
+      this.isSavingMeetingInfo = false;
+    }
+  }
+
+  addResponseOption(): void {
+    const label = this.newOptionLabel.trim();
+    if (label.length === 0) {
+      this.responseOptionsMessage = 'Bitte einen Text fuer die neue Option eingeben.';
+      return;
+    }
+
+    this.responseOptionsDraft = [
+      ...this.responseOptionsDraft,
+      createResponseOption(label, this.newOptionColor)
+    ];
+    this.newOptionLabel = '';
+    this.newOptionColor = '#0a66c2';
+    this.responseOptionsMessage = '';
+  }
+
+  removeResponseOption(optionId: string): void {
+    this.responseOptionsDraft = this.responseOptionsDraft.filter((option) => option.id !== optionId);
+  }
+
+  onOptionColorChange(optionId: string, color: string): void {
+    this.responseOptionsDraft = this.responseOptionsDraft.map((option) => (
+      option.id === optionId
+        ? { ...option, color: normalizeOptionColor(color) }
+        : option
+    ));
+  }
+
+  onOptionLabelChange(optionId: string, label: string): void {
+    this.responseOptionsDraft = this.responseOptionsDraft.map((option) => (
+      option.id === optionId
+        ? { ...option, label }
+        : option
+    ));
+  }
+
+  async saveResponseOptions(): Promise<void> {
+    if (this.event.training || this.isSavingResponseOptions || !this.event.documentID) {
+      return;
+    }
+
+    const cleanedOptions = this.responseOptionsDraft
+      .map((option) => ({
+        ...option,
+        label: option.label.trim(),
+        color: normalizeOptionColor(option.color)
+      }))
+      .filter((option) => option.label.length > 0);
+
+    if (cleanedOptions.length === 0) {
+      this.responseOptionsMessage = 'Bitte mindestens eine Abstimm-Moeglichkeit behalten.';
+      return;
+    }
+
+    this.isSavingResponseOptions = true;
+    this.responseOptionsMessage = '';
+
+    try {
+      const nextResponses = this.rebuildResponsesForOptions(cleanedOptions, this.event.responses);
+      const legacyResponses = getLegacyResponseArrays(nextResponses);
+      const eventCollection = collection(this.firestore, 'events');
+      await updateDoc(doc(eventCollection, this.event.documentID), {
+        responseOptions: cleanedOptions,
+        responses: nextResponses,
+        promised: legacyResponses.promised,
+        cancelled: legacyResponses.cancelled,
+        maby: legacyResponses.maby
+      });
+      this.responseOptionsDraft = cleanedOptions.map((option) => ({ ...option }));
+      this.responseOptionsMessage = 'Abstimm-Moeglichkeiten wurden gespeichert.';
+    } catch (error) {
+      console.error(error);
+      this.responseOptionsMessage = 'Abstimm-Moeglichkeiten konnten nicht gespeichert werden.';
+    } finally {
+      this.isSavingResponseOptions = false;
+    }
   }
 
   cancelEvent() {
@@ -242,10 +411,21 @@ export class EventDetailPageComponent implements OnInit {
   }
 
   getAttendanceSummary(): string {
+    if (!this.event.training && this.event.responseOptions.length > 0) {
+      return this.event.responseOptions
+        .map((option) => `${(this.event.responses[option.id] ?? []).length} ${option.label}`)
+        .join(' · ');
+    }
+
     return `${this.event.promised.length} zugesagt · ${this.event.maby.length} vielleicht · ${this.event.cancelled.length} abgesagt`;
   }
 
   getOpenResponsesCount(): number {
+    if (!this.event.training && this.event.responseOptions.length > 0) {
+      const respondedUserIds = getRespondedUserIds(this.event.responses);
+      return this.allUsers.filter((user) => !respondedUserIds.has(user.id)).length;
+    }
+
     const respondedUserIds = new Set([
       ...this.event.promised,
       ...this.event.cancelled,
@@ -255,9 +435,99 @@ export class EventDetailPageComponent implements OnInit {
     return this.allUsers.filter((user) => !respondedUserIds.has(user.id)).length;
   }
 
+  async sendTestReminder(): Promise<void> {
+    await this.sendReminder('test');
+  }
+
+  async sendAllReminders(): Promise<void> {
+    await this.sendReminder('all');
+  }
+
+  private async sendReminder(mode: 'test' | 'all'): Promise<void> {
+    if (
+      this.event.training
+      || this.isSendingTestReminder
+      || this.isSendingAllReminders
+      || !this.event.documentID
+    ) {
+      return;
+    }
+
+    if (mode === 'all' && this.getOpenResponsesCount() === 0) {
+      this.reminderMessage = 'Alle Mitglieder haben bereits abgestimmt.';
+      return;
+    }
+
+    if (mode === 'test') {
+      this.isSendingTestReminder = true;
+    } else {
+      this.isSendingAllReminders = true;
+    }
+    this.reminderMessage = '';
+
+    try {
+      const result = await this.eventReminderService.remindUnvotedUsers(this.event.documentID, mode);
+      if (mode === 'test') {
+        this.reminderMessage = result.sent > 0
+          ? 'Test-Erinnerung wurde an deine E-Mail-Adresse gesendet.'
+          : 'Test-Erinnerung konnte nicht versendet werden.';
+        return;
+      }
+
+      if (result.sent === 0) {
+        this.reminderMessage = result.skippedWithoutEmail > 0
+          ? 'Keine Erinnerung versendet. Bei offenen Mitgliedern fehlt eine gueltige E-Mail.'
+          : 'Keine offenen Abstimmungen gefunden.';
+      } else {
+        const skippedLabel = result.skippedWithoutEmail > 0
+          ? ` ${result.skippedWithoutEmail} ohne E-Mail uebersprungen.`
+          : '';
+        this.reminderMessage = `${result.sent} Erinnerungs-E-Mail${result.sent === 1 ? '' : 's'} versendet.${skippedLabel}`;
+      }
+    } catch (error) {
+      console.error(error);
+      this.reminderMessage = this.getReminderErrorMessage(error);
+    } finally {
+      this.isSendingTestReminder = false;
+      this.isSendingAllReminders = false;
+    }
+  }
+
   onBackPressed() {
-    this.router.navigate(['proben']);
+    this.router.navigate([this.event.training ? 'proben' : 'sonstige-termine']);
    }
+
+  private getReminderErrorMessage(error: unknown): string {
+    if (error instanceof FirebaseError && error.message.trim().length > 0) {
+      return error.message;
+    }
+
+    if (error && typeof error === 'object' && 'message' in error) {
+      const message = String((error as { message?: unknown }).message ?? '').trim();
+      if (message.length > 0) {
+        return message;
+      }
+    }
+
+    return 'Die Erinnerungen konnten nicht versendet werden. Pruefe den Vercel-Deploy und die Env Vars.';
+  }
+
+  private rebuildResponsesForOptions(
+    options: EventResponseOption[],
+    previousResponses: EventResponses
+  ): EventResponses {
+    const nextResponses = createEmptyResponses(options);
+    const optionIds = new Set(options.map((option) => option.id));
+
+    for (const [optionId, userIds] of Object.entries(previousResponses)) {
+      if (!optionIds.has(optionId)) {
+        continue;
+      }
+      nextResponses[optionId] = [...userIds];
+    }
+
+    return nextResponses;
+  }
 
   private padValue(value: number): string {
     return String(value).padStart(2, '0');

@@ -123,6 +123,116 @@
     color: #24425e;
 }
 
+.training-generator-card {
+    display: grid;
+    gap: 16px;
+}
+
+.break-training-panel {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 18px;
+    background: #f8fbff;
+    border: 1px solid #e2eaf2;
+}
+
+.break-training-panel h3 {
+    margin: 0;
+    color: #17324d;
+    font-size: 1.05rem;
+}
+
+.monday-calendar {
+    display: grid;
+    gap: 10px;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    gap: 8px;
+    align-items: center;
+}
+
+.calendar-header strong {
+    text-align: center;
+    color: #17324d;
+    text-transform: capitalize;
+}
+
+.calendar-nav-button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 14px;
+    background: #edf3f8;
+    color: #24425e;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.calendar-weekdays span {
+    text-align: center;
+    color: #6a7b8c;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    min-height: 40px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: #9aa8b5;
+    font-weight: 700;
+}
+
+.calendar-day.is-outside-month {
+    opacity: 0.45;
+}
+
+.calendar-day.is-monday:not(.is-selectable):not(.is-occupied) {
+    background: #f1f4f7;
+    color: #a0adb9;
+}
+
+.calendar-day.is-occupied {
+    background: rgba(220, 53, 69, 0.12);
+    border-color: rgba(220, 53, 69, 0.22);
+    color: #c03a46;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+.calendar-day.is-selectable {
+    background: #e8f2fb;
+    border-color: #c5daf0;
+    color: #0a66c2;
+    cursor: pointer;
+}
+
+.calendar-day.is-selected {
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    border-color: transparent;
+    color: #fff;
+}
+
+.selected-break-date {
+    margin: 0;
+    color: #24425e;
+    font-weight: 700;
+}
+
 .generator-field {
     display: grid;
     gap: 8px;
@@ -134,7 +244,8 @@
     font-weight: 700;
 }
 
-.generator-field input {
+.generator-field input,
+.generator-field textarea {
     width: 100%;
     min-height: 52px;
     padding: 0 14px;
@@ -142,6 +253,31 @@
     border-radius: 16px;
     background: #f9fbfd;
     color: #17324d;
+}
+
+.generator-field textarea {
+    min-height: 120px;
+    padding: 14px;
+    resize: vertical;
+}
+
+.news-banner-card {
+    display: grid;
+    gap: 16px;
+}
+
+.news-banner-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #24425e;
+    font-weight: 700;
+}
+
+.news-banner-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: #0a66c2;
 }
 
 .generator-message {

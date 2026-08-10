@@ -12,7 +12,16 @@
     <div>
       <span class="eyebrow">Event-Details</span>
       <h1>{{ event.name || 'Termin wird geladen...' }}</h1>
-      <p>{{ getEventDateLabel() }} · {{ event.time }} Uhr</p>
+      <p>
+        {{ getEventDateLabel() }}
+        <ng-container *ngIf="hasEventTime()">
+          · {{ event.training ? '' : 'Start ' }}{{ event.time }} Uhr
+        </ng-container>
+      </p>
+      <div class="hero-meeting-info" *ngIf="!event.training && hasMeetingInfo()">
+        <p *ngIf="hasMeetingTime()">Treffen: {{ event.meetingTime }} Uhr</p>
+        <p *ngIf="hasMeetingLocation()">Ort: {{ event.meetingLocation }}</p>
+      </div>
     </div>
 
     <div class="hero-summary-card">
@@ -21,6 +30,125 @@
       <span class="hero-summary-secondary">{{ getOpenResponsesCount() }} ausstehend</span>
     </div>
   </div>
+
+  <section class="meeting-info-card" *ngIf="!event.training && !isEventLoading">
+    <div class="section-headline">
+      <h2>Termininfos</h2>
+      <p>Optional: Startuhrzeit, Treffzeit und Ort festlegen oder nachtraeglich aendern. Leere Felder werden nicht angezeigt.</p>
+    </div>
+
+    <div class="meeting-info-form">
+      <label class="meeting-field">
+        <span>Startuhrzeit</span>
+        <div class="meeting-time-row">
+          <input type="time" [(ngModel)]="timeDraft">
+          <button
+            class="clear-time-button"
+            type="button"
+            *ngIf="timeDraft.trim().length > 0"
+            (click)="clearEventTime()"
+          >
+            Entfernen
+          </button>
+        </div>
+      </label>
+
+      <label class="meeting-field">
+        <span>Treffzeit</span>
+        <div class="meeting-time-row">
+          <input type="time" [(ngModel)]="meetingTimeDraft">
+          <button
+            class="clear-time-button"
+            type="button"
+            *ngIf="meetingTimeDraft.trim().length > 0"
+            (click)="clearMeetingTime()"
+          >
+            Entfernen
+          </button>
+        </div>
+      </label>
+
+      <label class="meeting-field meeting-field-wide">
+        <span>Treffpunkt</span>
+        <input type="text" [(ngModel)]="meetingLocationDraft" placeholder="z. B. Parkplatz am Festzelt">
+      </label>
+    </div>
+
+    <button class="primary-action" type="button" (click)="saveMeetingInfo()" [disabled]="isSavingMeetingInfo">
+      {{ isSavingMeetingInfo ? 'Wird gespeichert...' : 'Termininfos speichern' }}
+    </button>
+
+    <p class="meeting-info-message" *ngIf="meetingInfoMessage">{{ meetingInfoMessage }}</p>
+  </section>
+
+  <section class="meeting-info-card" *ngIf="!event.training && !isEventLoading">
+    <div class="section-headline">
+      <h2>Abstimm-Moeglichkeiten</h2>
+      <p>Lege fest, welche Antworten Mitglieder geben koennen. Farben und Texte sind frei waehlbar.</p>
+    </div>
+
+    <div class="response-options-list" *ngIf="responseOptionsDraft.length > 0">
+      <article class="response-option-item" *ngFor="let option of responseOptionsDraft">
+        <input
+          type="color"
+          [ngModel]="option.color"
+          (ngModelChange)="onOptionColorChange(option.id, $event)"
+          [attr.aria-label]="'Farbe fuer ' + option.label"
+        >
+        <input
+          type="text"
+          [ngModel]="option.label"
+          (ngModelChange)="onOptionLabelChange(option.id, $event)"
+          placeholder="Optionstext"
+        >
+        <button class="clear-time-button" type="button" (click)="removeResponseOption(option.id)">Entfernen</button>
+      </article>
+    </div>
+
+    <div class="add-option-row">
+      <input type="color" [(ngModel)]="newOptionColor" aria-label="Farbe der neuen Option">
+      <input type="text" [(ngModel)]="newOptionLabel" placeholder="z. B. Eventuell">
+      <button class="secondary-detail-action" type="button" (click)="addResponseOption()">Option hinzufuegen</button>
+    </div>
+
+    <button class="primary-action" type="button" (click)="saveResponseOptions()" [disabled]="isSavingResponseOptions">
+      {{ isSavingResponseOptions ? 'Wird gespeichert...' : 'Abstimm-Moeglichkeiten speichern' }}
+    </button>
+
+    <p class="meeting-info-message" *ngIf="responseOptionsMessage">{{ responseOptionsMessage }}</p>
+  </section>
+
+  <section class="meeting-info-card" *ngIf="!event.training && !isEventLoading">
+    <div class="section-headline">
+      <h2>Erinnerung senden</h2>
+      <p>
+        Erinnere Mitglieder ohne Rueckmeldung per E-Mail.
+        Aktuell offen: {{ getOpenResponsesCount() }}.
+      </p>
+    </div>
+
+    <div class="reminder-actions">
+      <button
+        class="secondary-detail-action"
+        type="button"
+        (click)="sendTestReminder()"
+        [disabled]="isSendingTestReminder || isSendingAllReminders"
+      >
+        {{ isSendingTestReminder ? 'Test-Mail wird versendet...' : 'Test: Nur an mich senden' }}
+      </button>
+
+      <button
+        class="primary-action"
+        type="button"
+        (click)="sendAllReminders()"
+        [disabled]="isSendingTestReminder || isSendingAllReminders || getOpenResponsesCount() === 0"
+      >
+        {{ isSendingAllReminders ? 'Erinnerungen werden versendet...' : 'Alle Nicht-Abstimmenden erinnern' }}
+      </button>
+    </div>
+
+    <p class="meeting-info-message" *ngIf="reminderMessage">{{ reminderMessage }}</p>
+  </section>
 
   <section class="view-toggle-card">
     <div class="view-toggle">
@@ -100,7 +228,18 @@
         </div>
       </div>
 
-      <div class="room-legend">
+      <div class="room-legend" *ngIf="!event.training && event.responseOptions.length > 0">
+        <div class="legend-item" *ngFor="let option of event.responseOptions">
+          <span class="legend-color" [style.background]="option.color"></span>
+          <span>{{ option.label }}</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color pending"></span>
+          <span>Ausstehend</span>
+        </div>
+      </div>
+
+      <div class="room-legend" *ngIf="event.training || event.responseOptions.length === 0">
         <div class="legend-item">
           <span class="legend-color promised"></span>
           <span>Zugesagt</span>

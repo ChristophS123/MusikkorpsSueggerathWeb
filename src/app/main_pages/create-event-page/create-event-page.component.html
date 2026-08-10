@@ -12,7 +12,7 @@
     <div>
       <span class="eyebrow">Organisation</span>
       <h1>Neuen Termin anlegen</h1>
-      <p>Erstelle schnell einen neuen sonstigen Termin mit Datum, Uhrzeit und klarer Struktur.</p>
+      <p>Erstelle schnell einen neuen sonstigen Termin mit Datum und optionalen Uhrzeiten sowie Treffpunkt.</p>
     </div>
 
     <div class="hero-tip-card">
@@ -25,7 +25,7 @@
   <section class="create-event-card">
     <div class="section-headline">
       <h2>Termindaten</h2>
-      <p>Alle Felder sind erforderlich.</p>
+      <p>Name und Datum sind erforderlich. Startuhrzeit, Treffzeit und Treffpunkt sind optional.</p>
     </div>
 
     <form #data="ngForm" class="create-event-form" (ngSubmit)="submitEventData(data)">
@@ -37,9 +37,8 @@
 
       <div class="form-grid">
         <label class="form-field">
-          <span>Uhrzeit</span>
-          <input type="time" name="time" required ngModel #time="ngModel">
-          <small *ngIf="time.invalid && time.touched">Bitte eine Uhrzeit waehlen.</small>
+          <span>Startuhrzeit (optional)</span>
+          <input type="time" name="time" ngModel>
         </label>
 
         <label class="form-field">
@@ -47,6 +46,51 @@
           <input type="date" name="date" required ngModel #date="ngModel">
           <small *ngIf="date.invalid && date.touched">Bitte ein Datum waehlen.</small>
         </label>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Treffzeit (optional)</span>
+          <input type="time" name="meetingTime" ngModel>
+        </label>
+
+        <label class="form-field">
+          <span>Treffpunkt (optional)</span>
+          <input type="text" name="meetingLocation" ngModel placeholder="z. B. Parkplatz am Festzelt">
+        </label>
+      </div>
+
+      <div class="response-options-section">
+        <div class="section-headline">
+          <h3>Abstimm-Moeglichkeiten</h3>
+          <p>Standard sind Absagen, ? und Zusagen. Du kannst Optionen entfernen, umbenennen, faerben oder eigene hinzufuegen.</p>
+        </div>
+
+        <div class="response-options-list" *ngIf="responseOptions.length > 0">
+          <article class="response-option-item" *ngFor="let option of responseOptions">
+            <input
+              type="color"
+              [ngModel]="option.color"
+              (ngModelChange)="onOptionColorChange(option.id, $event)"
+              [name]="'color_' + option.id"
+              [attr.aria-label]="'Farbe fuer ' + option.label"
+            >
+            <input
+              type="text"
+              [ngModel]="option.label"
+              (ngModelChange)="onOptionLabelChange(option.id, $event)"
+              [name]="'label_' + option.id"
+              placeholder="Optionstext"
+            >
+            <button class="remove-option-button" type="button" (click)="removeResponseOption(option.id)">Entfernen</button>
+          </article>
+        </div>
+
+        <div class="add-option-row">
+          <input type="color" [(ngModel)]="newOptionColor" name="newOptionColor" aria-label="Farbe der neuen Option">
+          <input type="text" [(ngModel)]="newOptionLabel" name="newOptionLabel" placeholder="z. B. Eventuell">
+          <button class="secondary-action" type="button" (click)="addResponseOption()">Option hinzufuegen</button>
+        </div>
       </div>
 
       <p class="status-message" *ngIf="statusMessage" [class.is-success]="statusType === 'success'" [class.is-error]="statusType === 'error'">

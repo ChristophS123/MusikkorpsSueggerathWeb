@@ -45,3 +45,9 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+# Secrets
+.env
+.env.local
+.env.*.local
+!**/.env.example

@@ -5,8 +5,20 @@ import { Router } from '@angular/router';
 import { User } from 'src/app/models/user';
 import { Event } from 'src/app/models/event';
 import { SongVotingOption } from 'src/app/models/song-voting-option';
+import { createEmptyNewsBanner, NewsBanner } from 'src/app/models/news-banner';
+import { NewsBannerService } from 'src/app/services/news-banner.service';
 import { collection, deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { firstValueFrom } from 'rxjs';
+
+interface OrganisationCalendarDay {
+  date: Date;
+  dayNumber: number;
+  isCurrentMonth: boolean;
+  isMonday: boolean;
+  hasExistingTraining: boolean;
+  isSelectable: boolean;
+  isSelected: boolean;
+}
 
 @Component({
   selector: 'app-organisation-page',
@@ -19,10 +31,22 @@ export class OrganisationPageComponent implements OnInit {
   generatedTrainingCount:number = 10;
   isGeneratingTrainings:boolean = false;
   trainingGenerationMessage:string = '';
+  showBreakTrainingCalendar:boolean = false;
+  selectedBreakStartDate:Date | null = null;
+  calendarViewDate:Date = this.getMonthStart(new Date());
+  calendarDays:OrganisationCalendarDay[] = [];
+  private existingTrainingDateKeys:Set<string> = new Set<string>();
+  readonly calendarWeekdayLabels:string[] = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
   songVotingName:string = '';
   isAddingSongVoting:boolean = false;
   songVotingMessage:string = '';
   songVotingOptions:SongVotingOption[] = [];
+  newsBanner:NewsBanner = createEmptyNewsBanner();
+  newsBannerTitle:string = '';
+  newsBannerDescription:string = '';
+  newsBannerEnabled:boolean = false;
+  isSavingNewsBanner:boolean = false;
+  newsBannerMessage:string = '';
   hasRunPastEventsCleanup:boolean = false;
   isUsersLoading:boolean = true;
   accountCount:number = 0;
@@ -38,10 +62,17 @@ export class OrganisationPageComponent implements OnInit {
     instrument: ''
   }
 
-  constructor(private router:Router, private firestore:Firestore, private auth:Auth) { 
+  constructor(
+    private router:Router,
+    private firestore:Firestore,
+    private auth:Auth,
+    private newsBannerService:NewsBannerService
+  ) {
   }
 
   ngOnInit(): void {
+    this.buildCalendarDays();
+
     this.auth.onAuthStateChanged((currentUser) => {
       this.user = currentUser?.uid;
 
@@ -51,6 +82,7 @@ export class OrganisationPageComponent implements OnInit {
       }
 
       this.loadUsers();
+      this.loadNewsBanner();
     });
    }
 
@@ -71,10 +103,90 @@ export class OrganisationPageComponent implements OnInit {
   }
 
   async generateTrainings(): Promise<void> {
+    await this.createGeneratedTrainings();
+  }
+
+  async toggleBreakTrainingCalendar(): Promise<void> {
+    this.showBreakTrainingCalendar = !this.showBreakTrainingCalendar;
+    this.trainingGenerationMessage = '';
+
+    if (this.showBreakTrainingCalendar) {
+      this.calendarViewDate = this.getMonthStart(new Date());
+      await this.refreshExistingTrainingDates();
+      this.buildCalendarDays();
+    }
+  }
+
+  shiftCalendarMonth(monthOffset: number): void {
+    this.calendarViewDate = new Date(
+      this.calendarViewDate.getFullYear(),
+      this.calendarViewDate.getMonth() + monthOffset,
+      1
+    );
+    this.buildCalendarDays();
+  }
+
+  selectBreakStartDate(day: OrganisationCalendarDay): void {
+    if (!day.isSelectable) {
+      return;
+    }
+
+    this.selectedBreakStartDate = this.createDateAtNineteen(day.date);
+    this.buildCalendarDays();
+    this.trainingGenerationMessage = '';
+  }
+
+  getCalendarMonthLabel(): string {
+    return this.calendarViewDate.toLocaleDateString('de-DE', {
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  getSelectedBreakStartDateLabel(): string {
+    if (!this.selectedBreakStartDate) {
+      return 'Noch kein Montag ausgewaehlt';
+    }
+
+    return this.selectedBreakStartDate.toLocaleDateString('de-DE', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  async generateTrainingsWithBreak(): Promise<void> {
+    if (!this.selectedBreakStartDate || !this.isMonday(this.selectedBreakStartDate)) {
+      this.trainingGenerationMessage = 'Bitte zuerst einen gueltigen Montag im Kalender auswaehlen.';
+      return;
+    }
+
+    if (this.isDateBeforeToday(this.selectedBreakStartDate)) {
+      this.trainingGenerationMessage = 'Der Startdatum-Montag darf nicht in der Vergangenheit liegen.';
+      return;
+    }
+
+    await this.refreshExistingTrainingDates();
+    if (this.hasExistingTrainingOnDate(this.selectedBreakStartDate)) {
+      this.selectedBreakStartDate = null;
+      this.buildCalendarDays();
+      this.trainingGenerationMessage = 'An diesem Montag gibt es bereits eine Probe. Bitte einen anderen Montag waehlen.';
+      return;
+    }
+
+    await this.createGeneratedTrainings(this.createDateAtNineteen(this.selectedBreakStartDate));
+  }
+
+  private async createGeneratedTrainings(forcedStartDate?: Date): Promise<void> {
     const trainingCount = Number(this.generatedTrainingCount);
 
     if (!Number.isInteger(trainingCount) || trainingCount < 1) {
       this.trainingGenerationMessage = 'Bitte eine gueltige Anzahl an Proben eingeben.';
+      return;
+    }
+
+    if (this.isGeneratingTrainings) {
       return;
     }
 
@@ -88,9 +200,25 @@ export class OrganisationPageComponent implements OnInit {
       const users = await firstValueFrom(collectionData(usersCollection));
       const promisedUsers = this.getUsersWithDefaultPromise(users);
       const latestTrainingDate = this.getLatestTrainingDate(events);
-      let nextTrainingDate = latestTrainingDate === null
-        ? this.getNextTrainingDate(new Date())
-        : this.getTrainingDateOneWeekLater(latestTrainingDate);
+
+      let nextTrainingDate: Date;
+      if (forcedStartDate) {
+        if (this.hasExistingTrainingOnDate(forcedStartDate, events)) {
+          this.trainingGenerationMessage = 'An diesem Montag gibt es bereits eine Probe. Bitte einen anderen Montag waehlen.';
+          return;
+        }
+
+        if (latestTrainingDate !== null && forcedStartDate.getTime() <= latestTrainingDate.getTime()) {
+          this.trainingGenerationMessage = 'Der gewaehlte Montag muss nach der letzten vorhandenen Probe liegen.';
+          return;
+        }
+
+        nextTrainingDate = this.createDateAtNineteen(forcedStartDate);
+      } else {
+        nextTrainingDate = latestTrainingDate === null
+          ? this.getNextTrainingDate(new Date())
+          : this.getTrainingDateOneWeekLater(latestTrainingDate);
+      }
 
       for (let i = 0; i < trainingCount; i++) {
         const generatedEvent = this.createTrainingEvent(nextTrainingDate, promisedUsers);
@@ -98,7 +226,18 @@ export class OrganisationPageComponent implements OnInit {
         nextTrainingDate = this.getTrainingDateOneWeekLater(nextTrainingDate);
       }
 
-      this.trainingGenerationMessage = `${trainingCount} Probe${trainingCount === 1 ? '' : 'n'} erfolgreich erstellt.`;
+      await this.refreshExistingTrainingDates();
+      if (
+        this.selectedBreakStartDate !== null
+        && this.hasExistingTrainingOnDate(this.selectedBreakStartDate)
+      ) {
+        this.selectedBreakStartDate = null;
+      }
+      this.buildCalendarDays();
+
+      this.trainingGenerationMessage = forcedStartDate
+        ? `${trainingCount} Probe${trainingCount === 1 ? '' : 'n'} ab dem ausgewaehlten Montag erfolgreich erstellt.`
+        : `${trainingCount} Probe${trainingCount === 1 ? '' : 'n'} erfolgreich erstellt.`;
     } catch (error) {
       console.error(error);
       this.trainingGenerationMessage = 'Die Proben konnten nicht erstellt werden.';
@@ -145,6 +284,43 @@ export class OrganisationPageComponent implements OnInit {
       console.error(error);
       this.songVotingMessage = 'Das Lied konnte nicht entfernt werden.';
     }
+  }
+
+  async saveNewsBanner(): Promise<void> {
+    const title = this.newsBannerTitle.trim();
+    const description = this.newsBannerDescription.trim();
+
+    if (this.newsBannerEnabled && (title.length === 0 || description.length === 0)) {
+      this.newsBannerMessage = 'Titel und Beschreibung sind erforderlich, wenn das Banner aktiv ist.';
+      return;
+    }
+
+    if (this.isSavingNewsBanner) {
+      return;
+    }
+
+    this.isSavingNewsBanner = true;
+    this.newsBannerMessage = '';
+
+    try {
+      await this.newsBannerService.saveNewsBanner({
+        title,
+        description,
+        enabled: this.newsBannerEnabled
+      });
+      this.newsBannerMessage = this.newsBannerEnabled
+        ? 'News Banner wurde gespeichert und ist aktiv.'
+        : 'News Banner wurde gespeichert und ist deaktiviert.';
+    } catch (error) {
+      console.error(error);
+      this.newsBannerMessage = 'Das News Banner konnte nicht gespeichert werden.';
+    } finally {
+      this.isSavingNewsBanner = false;
+    }
+  }
+
+  getNewsBannerStatusLabel(): string {
+    return this.newsBanner.enabled ? 'Aktiv auf der Startseite' : 'Deaktiviert';
   }
 
   getSongVotingCountLabel(): string {
@@ -221,9 +397,131 @@ export class OrganisationPageComponent implements OnInit {
     });
    }
 
+  private loadNewsBanner(): void {
+    this.newsBannerService.getNewsBanner().subscribe((banner) => {
+      this.newsBanner = banner;
+      this.newsBannerTitle = banner.title;
+      this.newsBannerDescription = banner.description;
+      this.newsBannerEnabled = banner.enabled;
+    });
+  }
+
   onBackPressed() {
     this.router.navigate(['main']);
    }
+
+  private async refreshExistingTrainingDates(): Promise<void> {
+    try {
+      const eventsCollection = collection(this.firestore, 'events');
+      const events = await firstValueFrom(collectionData(eventsCollection));
+      this.existingTrainingDateKeys = this.getTrainingDateKeys(events);
+
+      if (
+        this.selectedBreakStartDate !== null
+        && this.hasExistingTrainingOnDate(this.selectedBreakStartDate)
+      ) {
+        this.selectedBreakStartDate = null;
+      }
+    } catch (error) {
+      console.error(error);
+      this.existingTrainingDateKeys = new Set<string>();
+    }
+  }
+
+  private getTrainingDateKeys(events: unknown[]): Set<string> {
+    const trainingDateKeys = new Set<string>();
+
+    for (const eventModel of events) {
+      if (typeof eventModel !== 'object' || eventModel === null) {
+        continue;
+      }
+
+      const trainingEvent = eventModel as Partial<Event>;
+      if (!trainingEvent.training || trainingEvent.day === undefined || trainingEvent.month === undefined || trainingEvent.year === undefined) {
+        continue;
+      }
+
+      const eventDate = new Date(trainingEvent.year, trainingEvent.month - 1, trainingEvent.day);
+      trainingDateKeys.add(this.getDateKey(eventDate));
+    }
+
+    return trainingDateKeys;
+  }
+
+  private hasExistingTrainingOnDate(date: Date, events?: unknown[]): boolean {
+    if (events) {
+      return this.getTrainingDateKeys(events).has(this.getDateKey(date));
+    }
+
+    return this.existingTrainingDateKeys.has(this.getDateKey(date));
+  }
+
+  private getDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private buildCalendarDays(): void {
+    const monthStart = this.getMonthStart(this.calendarViewDate);
+    const calendarStart = new Date(monthStart);
+    const mondayOffset = (monthStart.getDay() + 6) % 7;
+    calendarStart.setDate(monthStart.getDate() - mondayOffset);
+
+    const days: OrganisationCalendarDay[] = [];
+    for (let dayIndex = 0; dayIndex < 42; dayIndex++) {
+      const date = new Date(calendarStart);
+      date.setDate(calendarStart.getDate() + dayIndex);
+      date.setHours(0, 0, 0, 0);
+
+      const isMonday = this.isMonday(date);
+      const isCurrentMonth = date.getMonth() === this.calendarViewDate.getMonth();
+      const hasExistingTraining = isMonday && this.hasExistingTrainingOnDate(date);
+      const isSelectable = isMonday && !this.isDateBeforeToday(date) && !hasExistingTraining;
+      const isSelected = this.selectedBreakStartDate !== null
+        && this.isSameCalendarDay(this.selectedBreakStartDate, date);
+
+      days.push({
+        date,
+        dayNumber: date.getDate(),
+        isCurrentMonth,
+        isMonday,
+        hasExistingTraining,
+        isSelectable,
+        isSelected
+      });
+    }
+
+    this.calendarDays = days;
+  }
+
+  private getMonthStart(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+
+  private isMonday(date: Date): boolean {
+    return date.getDay() === 1;
+  }
+
+  private isDateBeforeToday(date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    return compareDate.getTime() < today.getTime();
+  }
+
+  private isSameCalendarDay(firstDate: Date, secondDate: Date): boolean {
+    return firstDate.getFullYear() === secondDate.getFullYear()
+      && firstDate.getMonth() === secondDate.getMonth()
+      && firstDate.getDate() === secondDate.getDate();
+  }
+
+  private createDateAtNineteen(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 0, 0, 0);
+  }
 
   private getLatestTrainingDate(events: unknown[]): Date | null {
     let latestTrainingDate: Date | null = null;
@@ -303,31 +601,22 @@ export class OrganisationPageComponent implements OnInit {
           continue;
         }
 
-        const eventDate = this.getEventDate(event);
-        if (currentDate.getTime() > eventDate.getTime()) {
+        const endOfEventDay = new Date(
+          event.year,
+          event.month - 1,
+          event.day,
+          23,
+          59,
+          59,
+          999
+        );
+        if (currentDate.getTime() > endOfEventDay.getTime()) {
           await deleteDoc(doc(eventsCollection, event.documentID));
         }
       }
     } catch (error) {
       console.error(error);
     }
-  }
-
-  private getEventDate(event: Partial<Event>): Date {
-    const time = typeof event.time === 'string' ? event.time : '00:00';
-    const [hoursString, minutesString] = time.split(':');
-    const hours = Number(hoursString);
-    const minutes = Number(minutesString);
-
-    return new Date(
-      event.year ?? 0,
-      (event.month ?? 1) - 1,
-      event.day ?? 1,
-      Number.isNaN(hours) ? 0 : hours,
-      Number.isNaN(minutes) ? 0 : minutes,
-      0,
-      0
-    );
   }
 
   private createTrainingEvent(trainingDate: Date, promisedUsers: string[]): Event {
@@ -343,9 +632,13 @@ export class OrganisationPageComponent implements OnInit {
       month: month,
       year: year,
       time: '19:00',
+      meetingTime: '',
+      meetingLocation: '',
       promised: [...promisedUsers],
       cancelled: [],
       maby: [],
+      responseOptions: [],
+      responses: {},
       pieces: [],
       training: true,
       eventCancelled: false

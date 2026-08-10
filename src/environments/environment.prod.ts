@@ -1,5 +1,6 @@
 export const environment = {
     production: true,
+    apiBaseUrl: '',
     firebase : {
         apiKey: "AIzaSyBJZdRRa6bhQkdJ5e-rCg1Frb1UgOn7bdk",
         authDomain: "musikkorpsminus.firebaseapp.com",

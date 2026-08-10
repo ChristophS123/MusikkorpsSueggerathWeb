@@ -1,4 +1,4 @@
-<article class="user-status-card" [ngClass]="'status-' + getStatus()">
+<article class="user-status-card" [ngStyle]="getCardStyles()">
   <div class="user-identity">
     <div class="user-avatar">{{ user.username.charAt(0) || '?' }}</div>
     <div>
@@ -7,5 +7,5 @@
     </div>
   </div>
 
-  <div class="status-badge">{{ getStatusLabel() }}</div>
+  <div class="status-badge" [ngStyle]="getBadgeStyles()">{{ getStatusLabel() }}</div>
 </article>

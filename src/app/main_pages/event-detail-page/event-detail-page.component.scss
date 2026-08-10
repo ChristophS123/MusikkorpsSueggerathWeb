@@ -55,6 +55,144 @@
     font-size: 1rem;
 }
 
+.hero-meeting-info {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+}
+
+.hero-meeting-info p {
+    margin: 0;
+    color: rgba(245, 247, 251, 0.92);
+    font-weight: 700;
+}
+
+.meeting-info-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.2rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%);
+    box-shadow: 0 20px 40px rgba(15, 28, 45, 0.08);
+}
+
+.meeting-info-form {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.meeting-field {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.meeting-field span {
+    color: #526372;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.meeting-field input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #f9fbfd;
+    color: #17324d;
+}
+
+.meeting-time-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.clear-time-button {
+    min-height: 52px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 16px;
+    background: rgba(220, 53, 69, 0.12);
+    color: #c03a46;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.meeting-info-card .primary-action {
+    min-height: 52px;
+    border: none;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #123d6e 0%, #0a66c2 58%, #62b6ff 100%);
+    color: #fff;
+    font-weight: 800;
+    box-shadow: 0 14px 28px rgba(16, 76, 136, 0.22);
+}
+
+.meeting-info-message {
+    margin: 0;
+    color: #4f6070;
+    font-weight: 700;
+}
+
+.response-options-list,
+.add-option-row {
+    display: grid;
+    gap: 10px;
+}
+
+.response-option-item,
+.add-option-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.response-option-item input[type="text"],
+.add-option-row input[type="text"] {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14px;
+    border: 1px solid #d7e1eb;
+    border-radius: 16px;
+    background: #f9fbfd;
+    color: #17324d;
+}
+
+.response-option-item input[type="color"],
+.add-option-row input[type="color"] {
+    width: 52px;
+    height: 52px;
+    padding: 4px;
+    border: 1px solid #d7e1eb;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.secondary-detail-action {
+    min-height: 52px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 16px;
+    background: #edf3f8;
+    color: #24425e;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.reminder-actions {
+    display: grid;
+    gap: 10px;
+}
+
+@media (min-width: 768px) {
+    .reminder-actions {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    }
+}
+
 .hero-summary-card {
     display: flex;
     flex-direction: column;
@@ -359,6 +497,14 @@
         grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
         align-items: end;
         padding: 1.7rem;
+    }
+
+    .meeting-info-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .meeting-field-wide {
+        grid-column: 1 / -1;
     }
 
     .group-skeletons,

@@ -1,6 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { User } from 'src/app/models/user';
 import { Event } from 'src/app/models/event';
+import {
+  EventResponseOption,
+  getResponseOptionById,
+  getSelectedResponseOptionId,
+  getSoftBackgroundColor
+} from 'src/app/models/event-response-option';
 
 @Component({
   selector: 'app-event-details-user-item',
@@ -27,54 +33,77 @@ export class EventDetailsUserItemComponent {
     month: 0,
     year: 0,
     time: 'Zeit',
+    meetingTime: '',
+    meetingLocation: '',
     promised: [],
     cancelled: [],
     maby: [],
+    responseOptions: [],
+    responses: {},
     pieces: [],
     training: false,
     eventCancelled: true,
   };
 
-  getStatus(): 'promised' | 'cancelled' | 'maybe' | 'pending' {
+  getSelectedOption(): EventResponseOption | null {
+    if (!this.event.training && this.event.responseOptions.length > 0) {
+      return getResponseOptionById(
+        this.event.responseOptions,
+        getSelectedResponseOptionId(this.event.responses, this.user.id)
+      );
+    }
+
     if (this.event.promised.includes(this.user.id)) {
-      return 'promised';
+      return { id: 'promised', label: 'Zugesagt', color: '#28a745' };
     }
 
     if (this.event.cancelled.includes(this.user.id)) {
-      return 'cancelled';
+      return { id: 'cancelled', label: 'Abgesagt', color: '#dc3545' };
     }
 
     if (this.event.maby.includes(this.user.id)) {
-      return 'maybe';
+      return { id: 'maby', label: '?', color: '#ffc107' };
     }
 
-    return 'pending';
+    return null;
   }
 
   getStatusLabel(): string {
-    switch (this.getStatus()) {
-      case 'promised':
-        return 'Zugesagt';
-      case 'cancelled':
-        return 'Abgesagt';
-      case 'maybe':
-        return '?';
-      default:
-        return 'Ausstehend';
-    }
+    return this.getSelectedOption()?.label ?? 'Ausstehend';
   }
 
   getStatusDescription(): string {
-    switch (this.getStatus()) {
-      case 'promised':
-        return 'Nimmt am Termin teil';
-      case 'cancelled':
-        return 'Ist fuer diesen Termin abgemeldet';
-      case 'maybe':
-        return 'Rueckmeldung ist noch unsicher';
-      default:
-        return 'Noch keine Rueckmeldung abgegeben';
+    const selectedOption = this.getSelectedOption();
+    if (!selectedOption) {
+      return 'Noch keine Rueckmeldung abgegeben';
     }
+    return `Antwort: ${selectedOption.label}`;
+  }
+
+  getCardStyles(): Record<string, string> | null {
+    const selectedOption = this.getSelectedOption();
+    if (!selectedOption) {
+      return null;
+    }
+
+    return {
+      borderColor: getSoftBackgroundColor(selectedOption.color)
+    };
+  }
+
+  getBadgeStyles(): Record<string, string> {
+    const selectedOption = this.getSelectedOption();
+    if (!selectedOption) {
+      return {
+        background: 'rgba(154, 166, 178, 0.16)',
+        color: '#617181'
+      };
+    }
+
+    return {
+      background: getSoftBackgroundColor(selectedOption.color),
+      color: selectedOption.color
+    };
   }
 
 }

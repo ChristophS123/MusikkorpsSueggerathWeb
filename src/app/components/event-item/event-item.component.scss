@@ -51,6 +51,19 @@
     font-weight: 500;
 }
 
+.event-meeting-info {
+    display: grid;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.event-meeting-info p {
+    margin: 0;
+    color: #355b82;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
 .event-admin-link {
     display: inline-flex;
     align-items: center;
@@ -150,6 +163,14 @@
     gap: 10px;
 }
 
+.standard-response-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.custom-response-actions {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+
 .action-button {
     min-height: 52px;
     border: none;
@@ -161,7 +182,7 @@
 .action-button:disabled {
     cursor: not-allowed;
     background: linear-gradient(180deg, #cfd6de, #b4bcc6) !important;
-    color: #5f6b78;
+    color: #5f6b78 !important;
     box-shadow: none;
     opacity: 1;
 }

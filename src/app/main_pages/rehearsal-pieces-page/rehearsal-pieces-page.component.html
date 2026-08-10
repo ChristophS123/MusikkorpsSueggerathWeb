@@ -12,7 +12,10 @@
     <div>
       <span class="eyebrow">{{ getHeroEyebrow() }}</span>
       <h1>{{ rehearsal?.name || 'Stückliste wird geladen...' }}</h1>
-      <p *ngIf="rehearsal as currentRehearsal">{{ currentRehearsal.day }}.{{ currentRehearsal.month }}.{{ currentRehearsal.year }} · {{ currentRehearsal.time }} Uhr</p>
+      <p *ngIf="rehearsal as currentRehearsal">
+        {{ currentRehearsal.day }}.{{ currentRehearsal.month }}.{{ currentRehearsal.year }}
+        <ng-container *ngIf="currentRehearsal.time.trim().length > 0"> · {{ currentRehearsal.time }} Uhr</ng-container>
+      </p>
       <p *ngIf="!rehearsal && !isEventLoading">Dieser Termin konnte nicht geladen werden.</p>
     </div>
   </section>

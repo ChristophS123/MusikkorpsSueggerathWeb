@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, addDoc, collectionData } from '@angular/fire/firestore';
-import { Router, RouterLink } from '@angular/router';
-import { Auth, getAuth, user, signInWithEmailAndPassword, User } from '@angular/fire/auth';
+import { Router } from '@angular/router';
+import { getAuth } from '@angular/fire/auth';
+import { NewsBanner, createEmptyNewsBanner } from 'src/app/models/news-banner';
+import { NewsBannerService } from 'src/app/services/news-banner.service';
 
 const orchesterWitze: string[] = [
   "Der Dirigent sagt zum Orchester: 'Spielt bitte diesmal in meinem Tempo – nicht in eurem.'",
@@ -34,8 +35,12 @@ const orchesterWitze: string[] = [
 export class MainPageComponent implements OnInit{
 
   randomJoke:string = '';
+  newsBanner:NewsBanner = createEmptyNewsBanner();
 
-  constructor(private firestore:Firestore, private router:Router) {  }
+  constructor(
+    private router:Router,
+    private newsBannerService:NewsBannerService
+  ) {  }
   
   ngOnInit(): void {
     this.randomJoke = orchesterWitze[Math.floor(Math.random() * orchesterWitze.length)];
@@ -44,6 +49,16 @@ export class MainPageComponent implements OnInit{
       if(getAuth().currentUser == null)
         this.router.navigate(['login'])
     })
+
+    this.newsBannerService.getNewsBanner().subscribe((banner) => {
+      this.newsBanner = banner;
+    });
   }
 
- }
+  isNewsBannerVisible(): boolean {
+    return this.newsBanner.enabled
+      && this.newsBanner.title.length > 0
+      && this.newsBanner.description.length > 0;
+  }
+
+}

@@ -2,7 +2,13 @@
     <div class="event-card-header">
         <div class="event-primary">
             <h3>{{ event.name }}</h3>
-            <p class="event-datetime">{{ getEventDateLabel() }} · {{ event.time }} Uhr</p>
+            <p class="event-datetime">
+                {{ getEventDateLabel() }}<ng-container *ngIf="hasEventTime()"> · {{ event.time }} Uhr</ng-container>
+            </p>
+            <div class="event-meeting-info" *ngIf="hasMeetingInfo()">
+                <p *ngIf="hasMeetingTime()">Treffen: {{ event.meetingTime }} Uhr</p>
+                <p *ngIf="hasMeetingLocation()">Ort: {{ event.meetingLocation }}</p>
+            </div>
         </div>
 
         <div class="event-header-links">
@@ -16,11 +22,15 @@
     </div>
 
     <div class="event-status-row">
-        <span class="event-status-pill" [ngClass]="getStatusClass()">{{ getStatusLabel() }}</span>
+        <span
+            class="event-status-pill"
+            [ngClass]="getStatusClass()"
+            [ngStyle]="getStatusPillStyles()"
+        >{{ getStatusLabel() }}</span>
     </div>
 
 
-    <div class="event-actions" *ngIf="!event.eventCancelled">
+    <div class="event-actions" *ngIf="!event.eventCancelled && !usesCustomResponseOptions()" [style.gridTemplateColumns]="'repeat(3, minmax(0, 1fr))'">
         <button class="action-button decline" type="button" [class.active]="containsInCancelled()" [disabled]="containsInCancelled()" (click)="cancel()">
             {{ containsInCancelled() ? 'Abgesagt' : 'Absagen' }}
         </button>
@@ -29,6 +39,24 @@
         </button>
         <button class="action-button promise" type="button" [class.active]="containsInPromise()" [disabled]="containsInPromise()" (click)="promise()">
             {{ containsInPromise() ? 'Zugesagt' : 'Zusagen' }}
+        </button>
+    </div>
+
+    <div
+        class="event-actions"
+        [class.custom-response-actions]="!hasOnlyStandardResponseOptions()"
+        [class.standard-response-actions]="hasOnlyStandardResponseOptions()"
+        *ngIf="!event.eventCancelled && usesCustomResponseOptions()"
+    >
+        <button
+            *ngFor="let option of getResponseOptions()"
+            class="action-button custom-option"
+            type="button"
+            [disabled]="isOptionSelected(option.id)"
+            [ngStyle]="getOptionButtonStyles(option)"
+            (click)="selectResponseOption(option.id)"
+        >
+            {{ option.label }}
         </button>
     </div>
 </article>
