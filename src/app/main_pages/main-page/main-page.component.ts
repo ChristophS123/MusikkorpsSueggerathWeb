@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { getAuth } from '@angular/fire/auth';
 import { NewsBanner, createEmptyNewsBanner } from 'src/app/models/news-banner';
 import { NewsBannerService } from 'src/app/services/news-banner.service';
-
+// TODO: Add more jokes
 const orchesterWitze: string[] = [
   "Der Dirigent sagt zum Orchester: 'Spielt bitte diesmal in meinem Tempo – nicht in eurem.'",
   "Warum sitzen Saxophonisten immer so entspannt im Orchester? Weil sie wissen, dass sie erst in 120 Takten dran sind.",
